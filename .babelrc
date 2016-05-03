@@ -1,0 +1,27 @@
+{
+  "presets": ["es2015-loose", "stage-1", "react"],
+  "env": {
+    "development": {
+      "plugins": [
+        "transform-proto-to-assign",
+        ["css-in-js", {
+          "vendorPrefixes": true,
+          "bundleFile": "dist/bundle.css",
+          "minify": false,
+          "compressClassNames": false
+        }]
+      ]
+    },
+    "production": {
+      "plugins": [
+        "transform-proto-to-assign",
+        ["css-in-js", {
+          "vendorPrefixes": true,
+          "bundleFile": "dist/bundle.css",
+          "minify": true,
+          "compressClassNames": true
+        }]
+      ]
+    }
+  }
+}
