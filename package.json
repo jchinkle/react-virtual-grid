@@ -10,7 +10,7 @@
     "build": "npm run build-lib && npm run build-test",
     "build-lib": "node_modules/.bin/babel src --out-dir dist --source-maps",
     "build-test": "node_modules/.bin/browserify -t envify -t babelify -t reactify --extension='.jsx' -g envify -g uglifyify -s Fulcrum test/index.js > dist/test.js",
-    "watch": "node_modules/.bin/watchify --verbose -t envify -t babelify -t reactify --extension='.jsx' -g envify -s Fulcrum index.js -o dist/build.js",
+    "watch": "node_modules/.bin/babel src --out-dir dist --source-maps --watch",
     "watch-test": "node_modules/.bin/watchify --verbose -t envify -t babelify -t reactify --extension='.jsx' -g envify -s Fulcrum test/index.js -o dist/test.js",
     "clean": "rm -rf dist && mkdir -p dist",
     "serve": "./node_modules/.bin/serve -p 4001",
@@ -65,7 +65,8 @@
     "react-dom": "^15.0.1"
   },
   "dependencies": {
-    "classnames": "^2.2.4"
+    "classnames": "^2.2.4",
+    "element-resize-detector": "^1.1.1"
   },
   "keywords": [
     "grid",

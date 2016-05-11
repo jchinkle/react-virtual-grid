@@ -18,6 +18,10 @@ var _gridCalculator = require('./grid-calculator');
 
 var _gridCalculator2 = _interopRequireDefault(_gridCalculator);
 
+var _elementResizeDetector = require('element-resize-detector');
+
+var _elementResizeDetector2 = _interopRequireDefault(_elementResizeDetector);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
@@ -28,6 +32,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); }
 
+var POINTER_EVENTS_SCROLL_DELAY = 200;
+
 var Grid = function (_React$Component) {
   _inherits(Grid, _React$Component);
 
@@ -35,6 +41,23 @@ var Grid = function (_React$Component) {
     _classCallCheck(this, Grid);
 
     var _this = _possibleConstructorReturn(this, _React$Component.call(this, props));
+
+    _this.handleRootMouseMove = function (event) {
+      var isOverScrollbar = _this.isOverScrollbar(event.clientX, event.clientY);
+
+      // when the mouse moves between the 2 regions, swap the pointer events
+      if (_this._isOverScrollbar !== isOverScrollbar) {
+        if (isOverScrollbar) {
+          // when over the scrollbar area, enable the pointer events on the scroll area
+          _this.enableScrollableAreaPointerEvents();
+        } else {
+          // when over the grid area, disable the pointer events on the scroll area so the cells are interactive
+          _this.disableScrollableAreaPointerEventsSoon();
+        }
+      }
+
+      _this._isOverScrollbar = isOverScrollbar;
+    };
 
     _this.bindRoot = function (node) {
       _this._root = node;
@@ -72,6 +95,15 @@ var Grid = function (_React$Component) {
       _this._rightPaneBody = node;
     };
 
+    _this.handleResize = function (event) {
+      var _this$_scrollInner = _this._scrollInner;
+      var scrollTop = _this$_scrollInner.scrollTop;
+      var scrollLeft = _this$_scrollInner.scrollLeft;
+
+
+      _this.update(scrollTop, scrollLeft);
+    };
+
     _this.handleScroll = function (event) {
       var _event$target = event.target;
       var scrollTop = _event$target.scrollTop;
@@ -81,17 +113,33 @@ var Grid = function (_React$Component) {
       _this.update(scrollTop, scrollLeft);
     };
 
+    _this.handleWheel = function (event) {
+      if (!_this.isScrolling) {
+        _this.enableScrollableAreaPointerEvents();
+        event.preventDefault();
+      }
+
+      _this.disableScrollableAreaPointerEventsSoon();
+    };
+
+    _this._sizeDetector = (0, _elementResizeDetector2.default)({ strategy: 'scroll' });
+
     _this.state = {};
     return _this;
   }
 
   Grid.prototype.componentDidMount = function componentDidMount() {
+    this._sizeDetector.listenTo(this._root, this.handleResize);
     this._scrollInner.addEventListener('scroll', this.handleScroll);
+    this._root.addEventListener('wheel', this.handleWheel);
+
     this.update(0, 0);
   };
 
   Grid.prototype.componentWillUnmount = function componentWillUnmount() {
+    this._sizeDetector.uninstall(this._root);
     this._scrollInner.removeEventListener('scroll', this.handleScroll);
+    this._root.removeEventListener('wheel', this.handleWheel);
   };
 
   Grid.prototype.render = function render() {
@@ -106,7 +154,8 @@ var Grid = function (_React$Component) {
     return _react2.default.createElement(
       'div',
       { style: styles.container,
-        ref: this.bindRoot },
+        ref: this.bindRoot,
+        onMouseMove: this.handleRootMouseMove },
       _react2.default.createElement(
         'div',
         { style: styles.scrollOverlay,
@@ -322,6 +371,37 @@ var Grid = function (_React$Component) {
     );
   };
 
+  Grid.prototype.isOverScrollbar = function isOverScrollbar(x, y) {
+    var scrollbarSize = this.scrollbarSize;
+
+    return x >= this._root.offsetWidth - scrollbarSize || y >= this._root.offsetHeight - scrollbarSize;
+  };
+
+  Grid.prototype.enableScrollableAreaPointerEvents = function enableScrollableAreaPointerEvents() {
+    clearTimeout(this._disableScrollableAreaPointerEventsDelay);
+    this._disableScrollableAreaPointerEventsDelay = null;
+
+    this._scrollOverlay.style.pointerEvents = 'auto';
+  };
+
+  Grid.prototype.disableScrollableAreaPointerEventsSoon = function disableScrollableAreaPointerEventsSoon() {
+    var _this2 = this;
+
+    clearTimeout(this._disableScrollableAreaPointerEventsDelay);
+
+    this._disableScrollableAreaPointerEventsDelay = setTimeout(function () {
+      _this2._disableScrollableAreaPointerEventsDelay = null;
+
+      if (!_this2._isOverScrollbar) {
+        _this2.disableScrollableAreaPointerEventsNow();
+      }
+    }, POINTER_EVENTS_SCROLL_DELAY);
+  };
+
+  Grid.prototype.disableScrollableAreaPointerEventsNow = function disableScrollableAreaPointerEventsNow() {
+    this._scrollOverlay.style.pointerEvents = 'none';
+  };
+
   Grid.prototype.update = function update(scrollTop, scrollLeft) {
     var x = scrollLeft - this.props.preloadPixelsX;
     var y = scrollTop - this.props.preloadPixelsY;
@@ -336,21 +416,34 @@ var Grid = function (_React$Component) {
     var cells = this.calculator.cellsWithinBounds(bounds, this.props.rowCount, this.props.columnCount);
 
     if (cells.changed) {
+      var fromRow = cells.rows[0][0];
+      var toRow = cells.rows[cells.rows.length - 1][0];
+      var fromColumn = cells.columns[0][0];
+      var toColumn = cells.columns[cells.columns.length - 1][0];
+
+      if (this.props.onExtentsChange) {
+        this.props.onExtentsChange(fromRow, toRow, fromColumn, toColumn);
+      }
+
       this.setState({ cells: cells });
     }
 
     if (this.state.cells) {
-      if (this._leftPaneBody) {
-        this._leftPaneBody.childNodes[0].style.top = -scrollTop - this.fixedHeadersHeight + 'px';
-      }
-
-      if (this._rightPaneHeader) {
-        this._rightPaneHeader.childNodes[0].style.left = -scrollLeft - this.fixedColumnsWidth + 'px';
-      }
-
-      this._rightPaneBody.childNodes[0].style.top = -scrollTop - this.fixedHeadersHeight + 'px';
-      this._rightPaneBody.childNodes[0].style.left = -scrollLeft - this.fixedColumnsWidth + 'px';
+      this.setScroll(scrollLeft, scrollTop);
     }
+  };
+
+  Grid.prototype.setScroll = function setScroll(x, y) {
+    if (this._leftPaneBody) {
+      this._leftPaneBody.childNodes[0].style.top = -y - this.fixedHeadersHeight + 'px';
+    }
+
+    if (this._rightPaneHeader) {
+      this._rightPaneHeader.childNodes[0].style.left = -x - this.fixedColumnsWidth + 'px';
+    }
+
+    this._rightPaneBody.childNodes[0].style.top = -y - this.fixedHeadersHeight + 'px';
+    this._rightPaneBody.childNodes[0].style.left = -x - this.fixedColumnsWidth + 'px';
   };
 
   Grid.prototype.renderCellRange = function renderCellRange(fromRow, toRow, fromColumn, toColumn, rows, columns) {
@@ -419,6 +512,20 @@ var Grid = function (_React$Component) {
       return leftOffset;
     }
   }, {
+    key: 'scrollbarSize',
+    get: function get() {
+      if (this._scrollbarSize == null) {
+        this._scrollbarSize = Math.max(15, this._scrollInner.offsetHeight - this._scrollInner.clientHeight);
+      }
+
+      return this._scrollbarSize;
+    }
+  }, {
+    key: 'isScrolling',
+    get: function get() {
+      return this._disableScrollableAreaPointerEventsDelay != null;
+    }
+  }, {
     key: 'calculator',
     get: function get() {
       if (!this._calculator) {
@@ -459,7 +566,9 @@ Grid.propTypes = {
 
   rowHeight: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.number, _react2.default.PropTypes.func]),
 
-  renderCell: _react2.default.PropTypes.func
+  renderCell: _react2.default.PropTypes.func,
+
+  onExtentsChange: _react2.default.PropTypes.func
 };
 Grid.defaultProps = {
   preloadPixelsX: 0,
@@ -476,7 +585,8 @@ var styles = {
     left: 0,
     top: 0,
     right: 0,
-    bottom: 0
+    bottom: 0,
+    zIndex: 1
   },
 
   scrollOverlay: {
@@ -485,8 +595,9 @@ var styles = {
     top: 0,
     right: 0,
     bottom: 0,
-    zIndex: 10,
-    overflow: 'hidden'
+    zIndex: 1,
+    overflow: 'hidden',
+    pointerEvents: 'none'
   },
 
   scrollContainer: {
@@ -496,12 +607,7 @@ var styles = {
     right: 0,
     bottom: 0,
     overflow: 'scroll',
-    WebkitOverflowScrolling: 'touch',
-    backgroundColor: 'transparent'
-  },
-
-  scrollContent: {
-    backgroundColor: 'transparent'
+    WebkitOverflowScrolling: 'touch'
   },
 
   gridBody: {
@@ -516,22 +622,6 @@ var styles = {
   pane: {
     position: 'absolute',
     overflow: 'hidden'
-  },
-
-  leftPaneHeader: {
-    borderRight: '1px solid #000'
-  },
-
-  leftPaneBody: {
-    borderRight: '1px solid #000'
-  },
-
-  rightPaneHeader: {
-    borderBottom: '1px solid #000'
-  },
-
-  rightPaneBody: {
-    backgroundColor: 'transparent'
   }
 };
 

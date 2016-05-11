@@ -1,6 +1,9 @@
 import React from 'react';
 import cx from 'classnames';
 import GridCalculator from './grid-calculator';
+import elementResizeDetector from 'element-resize-detector';
+
+const POINTER_EVENTS_SCROLL_DELAY = 200;
 
 export default class Grid extends React.Component {
   static propTypes = {
@@ -24,7 +27,9 @@ export default class Grid extends React.Component {
 
     rowHeight: React.PropTypes.oneOfType([ React.PropTypes.number, React.PropTypes.func ]),
 
-    renderCell: React.PropTypes.func
+    renderCell: React.PropTypes.func,
+
+    onExtentsChange: React.PropTypes.func
   };
 
   static defaultProps = {
@@ -37,16 +42,23 @@ export default class Grid extends React.Component {
   constructor(props) {
     super(props);
 
+    this._sizeDetector = elementResizeDetector({strategy: 'scroll'});
+
     this.state = {};
   }
 
   componentDidMount() {
+    this._sizeDetector.listenTo(this._root, this.handleResize);
     this._scrollInner.addEventListener('scroll', this.handleScroll);
+    this._root.addEventListener('wheel', this.handleWheel);
+
     this.update(0, 0);
   }
 
   componentWillUnmount() {
+    this._sizeDetector.uninstall(this._root);
     this._scrollInner.removeEventListener('scroll', this.handleScroll);
+    this._root.removeEventListener('wheel', this.handleWheel);
   }
 
   render() {
@@ -60,7 +72,8 @@ export default class Grid extends React.Component {
 
     return (
       <div style={styles.container}
-           ref={this.bindRoot}>
+           ref={this.bindRoot}
+           onMouseMove={this.handleRootMouseMove}>
         <div style={styles.scrollOverlay}
              ref={this.bindScrollOverlay}>
           <div style={styles.scrollContainer}
@@ -310,6 +323,64 @@ export default class Grid extends React.Component {
     );
   }
 
+  get scrollbarSize() {
+    if (this._scrollbarSize == null) {
+      this._scrollbarSize = Math.max(15, this._scrollInner.offsetHeight - this._scrollInner.clientHeight);
+    }
+
+    return this._scrollbarSize;
+  }
+
+  isOverScrollbar(x, y) {
+    const scrollbarSize = this.scrollbarSize;
+
+    return (x >= this._root.offsetWidth - scrollbarSize) || (y >= this._root.offsetHeight - scrollbarSize);
+  }
+
+  handleRootMouseMove = (event) => {
+    const isOverScrollbar = this.isOverScrollbar(event.clientX, event.clientY);
+
+    // when the mouse moves between the 2 regions, swap the pointer events
+    if (this._isOverScrollbar !== isOverScrollbar) {
+      if (isOverScrollbar) {
+        // when over the scrollbar area, enable the pointer events on the scroll area
+        this.enableScrollableAreaPointerEvents();
+      } else {
+        // when over the grid area, disable the pointer events on the scroll area so the cells are interactive
+        this.disableScrollableAreaPointerEventsSoon();
+      }
+    }
+
+    this._isOverScrollbar = isOverScrollbar;
+  }
+
+  enableScrollableAreaPointerEvents() {
+    clearTimeout(this._disableScrollableAreaPointerEventsDelay);
+    this._disableScrollableAreaPointerEventsDelay = null;
+
+    this._scrollOverlay.style.pointerEvents = 'auto';
+  }
+
+  disableScrollableAreaPointerEventsSoon() {
+    clearTimeout(this._disableScrollableAreaPointerEventsDelay);
+
+    this._disableScrollableAreaPointerEventsDelay = setTimeout(() => {
+      this._disableScrollableAreaPointerEventsDelay = null;
+
+      if (!this._isOverScrollbar) {
+        this.disableScrollableAreaPointerEventsNow();
+      }
+    }, POINTER_EVENTS_SCROLL_DELAY);
+  }
+
+  get isScrolling() {
+    return this._disableScrollableAreaPointerEventsDelay != null;
+  }
+
+  disableScrollableAreaPointerEventsNow() {
+    this._scrollOverlay.style.pointerEvents = 'none';
+  }
+
   bindRoot = (node) => {
     this._root = node;
   }
@@ -346,10 +417,25 @@ export default class Grid extends React.Component {
     this._rightPaneBody = node;
   }
 
+  handleResize = (event) => {
+    const {scrollTop, scrollLeft} = this._scrollInner;
+
+    this.update(scrollTop, scrollLeft);
+  }
+
   handleScroll = (event) => {
     const {scrollTop, scrollLeft} = event.target;
 
     this.update(scrollTop, scrollLeft);
+  }
+
+  handleWheel = (event) => {
+    if (!this.isScrolling) {
+      this.enableScrollableAreaPointerEvents();
+      event.preventDefault();
+    }
+
+    this.disableScrollableAreaPointerEventsSoon();
   }
 
   update(scrollTop, scrollLeft) {
@@ -366,21 +452,34 @@ export default class Grid extends React.Component {
     const cells = this.calculator.cellsWithinBounds(bounds, this.props.rowCount, this.props.columnCount);
 
     if (cells.changed) {
+      const fromRow = cells.rows[0][0];
+      const toRow = cells.rows[cells.rows.length - 1][0];
+      const fromColumn = cells.columns[0][0];
+      const toColumn = cells.columns[cells.columns.length - 1][0];
+
+      if (this.props.onExtentsChange) {
+        this.props.onExtentsChange(fromRow, toRow, fromColumn, toColumn);
+      }
+
       this.setState({cells: cells});
     }
 
     if (this.state.cells) {
-      if (this._leftPaneBody) {
-        this._leftPaneBody.childNodes[0].style.top = (-scrollTop - this.fixedHeadersHeight) + 'px';
-      }
-
-      if (this._rightPaneHeader) {
-        this._rightPaneHeader.childNodes[0].style.left = (-scrollLeft - this.fixedColumnsWidth) + 'px';
-      }
-
-      this._rightPaneBody.childNodes[0].style.top = (-scrollTop - this.fixedHeadersHeight) + 'px';
-      this._rightPaneBody.childNodes[0].style.left = (-scrollLeft - this.fixedColumnsWidth) + 'px';
+      this.setScroll(scrollLeft, scrollTop);
     }
+  }
+
+  setScroll(x, y) {
+    if (this._leftPaneBody) {
+      this._leftPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+    }
+
+    if (this._rightPaneHeader) {
+      this._rightPaneHeader.childNodes[0].style.left = (-x - this.fixedColumnsWidth) + 'px';
+    }
+
+    this._rightPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+    this._rightPaneBody.childNodes[0].style.left = (-x - this.fixedColumnsWidth) + 'px';
   }
 
   get calculator() {
@@ -421,7 +520,8 @@ const styles = {
     left: 0,
     top: 0,
     right: 0,
-    bottom: 0
+    bottom: 0,
+    zIndex: 1
   },
 
   scrollOverlay: {
@@ -430,8 +530,9 @@ const styles = {
     top: 0,
     right: 0,
     bottom: 0,
-    zIndex: 10,
-    overflow: 'hidden'
+    zIndex: 1,
+    overflow: 'hidden',
+    pointerEvents: 'none'
   },
 
   scrollContainer: {
@@ -441,12 +542,7 @@ const styles = {
     right: 0,
     bottom: 0,
     overflow: 'scroll',
-    WebkitOverflowScrolling: 'touch',
-    backgroundColor: 'transparent'
-  },
-
-  scrollContent: {
-    backgroundColor: 'transparent'
+    WebkitOverflowScrolling: 'touch'
   },
 
   gridBody: {
@@ -461,22 +557,6 @@ const styles = {
   pane: {
     position: 'absolute',
     overflow: 'hidden'
-  },
-
-  leftPaneHeader: {
-    borderRight: '1px solid #000'
-  },
-
-  leftPaneBody: {
-    borderRight: '1px solid #000'
-  },
-
-  rightPaneHeader: {
-    borderBottom: '1px solid #000'
-  },
-
-  rightPaneBody: {
-    backgroundColor: 'transparent'
   }
 };
 

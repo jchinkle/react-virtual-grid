@@ -47,13 +47,6 @@ var GridCalculator = function () {
     // find the other edge
     while (maxPixel > pixel && sizes.length < maxCells && index < maxCells) {
       var _size = this.getSize(index, cache, calculateSize, estimatedSize);
-      // let customSize = cache[index];
-
-      // if (customSize == null) {
-      //   customSize = cache[index] = calculateSize(index);
-      // }
-
-      // const size = (customSize != null ? customSize : estimatedSize);
 
       sizes.push([index, pixel, _size]);
 
