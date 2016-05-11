@@ -143,50 +143,6 @@ export default class Grid extends React.Component {
     );
   }
 
-  get scrollableWidth() {
-    if (!this.state.cells || !this.state.cells.columns.length) {
-      return this.props.estimatedColumnWidth * this.props.columnCount;
-    }
-
-    const lastColumn = this.state.cells.columns[this.state.cells.columns.length - 1];
-    const width = lastColumn[1] + lastColumn[2];
-
-    return width + ((this.props.columnCount - lastColumn[0] - 1) * this.props.estimatedColumnWidth);
-  }
-
-  get scrollableHeight() {
-    if (!this.state.cells || !this.state.cells.rows.length) {
-      return this.props.estimatedRowHeight * this.props.rowCount;
-    }
-
-    const lastRow = this.state.cells.rows[this.state.cells.rows.length - 1];
-    const height = lastRow[1] + lastRow[2];
-
-    return height + ((this.props.rowCount - lastRow[0] - 1) * this.props.estimatedRowHeight);
-  }
-
-  get fixedHeadersHeight() {
-    if (!this.state.cells || !this.state.cells.topLeftRows.length) {
-      return 0;
-    }
-
-    const lastTopLeftRow = this.state.cells.topLeftRows[this.state.cells.topLeftRows.length - 1];
-    const topOffset = lastTopLeftRow[1] + lastTopLeftRow[2];
-
-    return topOffset;
-  }
-
-  get fixedColumnsWidth() {
-    if (!this.state.cells || !this.state.cells.leftColumns.length) {
-      return 0;
-    }
-
-    const lastLeftColumn = this.state.cells.leftColumns[this.state.cells.leftColumns.length - 1];
-    const leftOffset = lastLeftColumn[1] + lastLeftColumn[2];
-
-    return leftOffset;
-  }
-
   renderLeftPaneBody() {
     if (!this.state.cells || this.props.fixedColumnCount < 1) {
       return null;
@@ -321,6 +277,50 @@ export default class Grid extends React.Component {
         </div>
       </div>
     );
+  }
+
+  get scrollableWidth() {
+    if (!this.state.cells || !this.state.cells.columns.length) {
+      return this.props.estimatedColumnWidth * this.props.columnCount;
+    }
+
+    const lastColumn = this.state.cells.columns[this.state.cells.columns.length - 1];
+    const width = lastColumn[1] + lastColumn[2];
+
+    return width + ((this.props.columnCount - lastColumn[0] - 1) * this.props.estimatedColumnWidth);
+  }
+
+  get scrollableHeight() {
+    if (!this.state.cells || !this.state.cells.rows.length) {
+      return this.props.estimatedRowHeight * this.props.rowCount;
+    }
+
+    const lastRow = this.state.cells.rows[this.state.cells.rows.length - 1];
+    const height = lastRow[1] + lastRow[2];
+
+    return height + ((this.props.rowCount - lastRow[0] - 1) * this.props.estimatedRowHeight);
+  }
+
+  get fixedHeadersHeight() {
+    if (!this.state.cells || !this.state.cells.topLeftRows.length) {
+      return 0;
+    }
+
+    const lastTopLeftRow = this.state.cells.topLeftRows[this.state.cells.topLeftRows.length - 1];
+    const topOffset = lastTopLeftRow[1] + lastTopLeftRow[2];
+
+    return topOffset;
+  }
+
+  get fixedColumnsWidth() {
+    if (!this.state.cells || !this.state.cells.leftColumns.length) {
+      return 0;
+    }
+
+    const lastLeftColumn = this.state.cells.leftColumns[this.state.cells.leftColumns.length - 1];
+    const leftOffset = lastLeftColumn[1] + lastLeftColumn[2];
+
+    return leftOffset;
   }
 
   get scrollbarSize() {
