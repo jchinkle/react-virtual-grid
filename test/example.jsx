@@ -47,11 +47,13 @@ export default class Example extends React.Component {
   }
 
   calculateColumnWidth = (column) => {
-    return parseInt(128 + (((column % 256) + 1)), 10);
+    return 128;
+    // return parseInt(128 + (((column % 256) + 1)), 10);
   }
 
   calculateRowHeight = (row) => {
-    return parseInt(32 + ((row % 64) + 1), 10);
+    return 32;
+    // return parseInt(32 + ((row % 64) + 1), 10);
   }
 
   renderCell = (row, rowData, column, columnData) => {
@@ -107,7 +109,8 @@ const styles = cssInJS({
     textAlign: 'center',
     fontFamily: 'sans-serif',
     paddingTop: 8,
-    fontSize: 12
+    fontSize: 12,
+    boxSizing: 'border-box'
   },
 
   cellLeft: {
