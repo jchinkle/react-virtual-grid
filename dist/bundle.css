@@ -1,26 +1,13 @@
-.test_example_jsx-styles-container {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  border: none;
-  box-sizing: border-box;
-  overflow: hidden;
+.src_resizable-header-cell_jsx-styles-container {
+  padding: 8px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: bold;
 }
-.test_example_jsx-styles-cell {
-  position: absolute;
-  overflow: hidden;
-  border-bottom: 1px solid #000;
-  border-left: 1px solid #000;
-  border-right: 1px solid transparent;
-  border-top: 1px solid transparent;
-  padding: 3px;
-  text-align: center;
-  font-family: sans-serif;
-  padding-top: 8px;
-  font-size: 12px;
-}
-.test_example_jsx-styles-cellLeft {
-  border-left: 1px solid transparent;
+.src_resizable-header-cell_jsx-styles-measure {
+  padding: 8px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: bold;
+  border: 1px solid #000;
 }

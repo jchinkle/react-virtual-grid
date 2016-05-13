@@ -122,6 +122,46 @@ var Grid = function (_React$Component) {
       _this.disableScrollableAreaPointerEventsSoon();
     };
 
+    _this.handleColumnResize = function (column, width) {
+      _this._pinnedColumnWidths[column] = Math.min(10000, Math.max(20, width));
+      _this.invalidateSizes();
+      _this.refresh();
+    };
+
+    _this.handleRowResize = function (row, height) {
+      _this._pinnedRowHeights[row] = Math.min(10000, Math.max(20, height));
+      _this.invalidateSizes();
+      _this.refresh();
+    };
+
+    _this.refresh = function () {
+      var _this$_scrollInner2 = _this._scrollInner;
+      var scrollTop = _this$_scrollInner2.scrollTop;
+      var scrollLeft = _this$_scrollInner2.scrollLeft;
+
+
+      _this.update(scrollTop, scrollLeft);
+    };
+
+    _this.calculateRowHeight = function (row) {
+      if (_this._pinnedRowHeights[row] != null) {
+        return _this._pinnedRowHeights[row];
+      }
+
+      return _this.props.rowHeight(row);
+    };
+
+    _this.calculateColumnWidth = function (column) {
+      if (_this._pinnedColumnWidths[column] != null) {
+        return _this._pinnedColumnWidths[column];
+      }
+
+      return _this.props.columnWidth(column);
+    };
+
+    _this._pinnedColumnWidths = {};
+    _this._pinnedRowHeights = {};
+
     _this._sizeDetector = (0, _elementResizeDetector2.default)({ strategy: 'scroll' });
 
     _this.state = {};
@@ -402,6 +442,10 @@ var Grid = function (_React$Component) {
     this._scrollOverlay.style.pointerEvents = 'none';
   };
 
+  Grid.prototype.invalidateSizes = function invalidateSizes() {
+    this.calculator.invalidate();
+  };
+
   Grid.prototype.update = function update(scrollTop, scrollLeft) {
     var x = scrollLeft - this.props.preloadPixelsX;
     var y = scrollTop - this.props.preloadPixelsY;
@@ -456,7 +500,7 @@ var Grid = function (_React$Component) {
         var rowData = rows[row - fromRow];
         var columnData = columns[column - fromColumn];
 
-        cells.push(render(row, rowData, column, columnData));
+        cells.push(render(row, rowData, column, columnData, this));
       }
     }
 
@@ -534,8 +578,8 @@ var Grid = function (_React$Component) {
         this._calculator.estimatedRowHeight = this.props.estimatedRowHeight;
         this._calculator.fixedColumnCount = this.props.fixedColumnCount;
         this._calculator.fixedHeaderCount = this.props.fixedHeaderCount;
-        this._calculator.calculateRowHeight = this.props.rowHeight;
-        this._calculator.calculateColumnWidth = this.props.columnWidth;
+        this._calculator.calculateRowHeight = this.calculateRowHeight;
+        this._calculator.calculateColumnWidth = this.calculateColumnWidth;
       }
 
       return this._calculator;
@@ -568,13 +612,19 @@ Grid.propTypes = {
 
   renderCell: _react2.default.PropTypes.func,
 
-  onExtentsChange: _react2.default.PropTypes.func
+  onExtentsChange: _react2.default.PropTypes.func,
+
+  resizableColumns: _react2.default.PropTypes.bool,
+
+  resizableRows: _react2.default.PropTypes.bool
 };
 Grid.defaultProps = {
   preloadPixelsX: 0,
   preloadPixelsY: 0,
   estimatedColumnWidth: 130,
-  estimatedRowHeight: 30
+  estimatedRowHeight: 30,
+  resizableColumns: true,
+  resizableRows: true
 };
 exports.default = Grid;
 
@@ -586,7 +636,7 @@ var styles = {
     top: 0,
     right: 0,
     bottom: 0,
-    zIndex: 1
+    zIndex: 2
   },
 
   scrollOverlay: {
@@ -595,7 +645,7 @@ var styles = {
     top: 0,
     right: 0,
     bottom: 0,
-    zIndex: 1,
+    zIndex: 2,
     overflow: 'hidden',
     pointerEvents: 'none'
   },
