@@ -1,11 +1,15 @@
 import React from 'react';
-import Grid from './grid';
 
 export default class ResizeHandle extends React.Component {
   static propTypes = {
     onResizeStart: React.PropTypes.func,
     onResize: React.PropTypes.func,
-    onResizeEnd: React.PropTypes.func
+    onResizeEnd: React.PropTypes.func,
+    dimension: React.PropTypes.string
+  };
+
+  static defaultProps = {
+    dimension: 'width'
   };
 
   constructor(props) {
@@ -14,7 +18,10 @@ export default class ResizeHandle extends React.Component {
     this._pageX = null;
     this._pageY = null;
 
-    this.state = {};
+    this.state = {
+      dragging: false,
+      hovering: false
+    };
   }
 
   componentWillUnmount() {
@@ -25,11 +32,18 @@ export default class ResizeHandle extends React.Component {
   render() {
     const {styles} = ResizeHandle;
 
-    let lineStyles = {
-      ...styles.line
-    };
+    let containerStyles = null;
+    let lineStyles = null;
 
-    if (this.state.hover) {
+    if (this.props.dimension === 'width') {
+      containerStyles = styles.containerWidth;
+      lineStyles = styles.lineWidth;
+    } else {
+      containerStyles = styles.containerHeight;
+      lineStyles = styles.lineHeight;
+    }
+
+    if (this.state.hovering || this.state.dragging) {
       lineStyles = {
         ...lineStyles,
         ...styles.lineHover
@@ -37,7 +51,7 @@ export default class ResizeHandle extends React.Component {
     }
 
     return (
-      <div style={styles.container}
+      <div style={containerStyles}
            onMouseEnter={this.handleMouseEnter}
            onMouseLeave={this.handleMouseLeave}
            onMouseDownCapture={this.handleMouseDown}
@@ -58,7 +72,7 @@ export default class ResizeHandle extends React.Component {
   }
 
   handleTouchEnd = (event) => {
-    this.end(event.touches[0].pageX, event.touches[0].pageY);
+    this.end();
   }
 
   handleMouseDown = (event) => {
@@ -72,10 +86,12 @@ export default class ResizeHandle extends React.Component {
   }
 
   handleMouseUp = (event) => {
-    this.end(event.pageX, event.pageY);
+    this.end();
   }
 
   start(pageX, pageY) {
+    this.setState({dragging: true});
+
     this._pageX = pageX;
     this._pageY = pageY;
 
@@ -99,24 +115,23 @@ export default class ResizeHandle extends React.Component {
     this._pageY = pageY;
   }
 
-  end(pageX, pageY) {
+  end() {
     this.releaseMouse();
     this.releaseTouch();
 
-    const diffX = pageX - this._pageX;
-    const diffY = pageY - this._pageY;
-
     if (this.props.onResizeEnd) {
-      this.props.onResizeEnd(diffX, diffY);
+      this.props.onResizeEnd();
     }
+
+    this.setState({dragging: false});
   }
 
   handleMouseEnter = (event) => {
-    this.setState({hover: true});
+    this.setState({hovering: true});
   }
 
   handleMouseLeave = (event) => {
-    this.setState({hover: false});
+    this.setState({hovering: false});
   }
 
   captureMouse() {
@@ -141,7 +156,7 @@ export default class ResizeHandle extends React.Component {
 }
 
 const styles = {
-  container: {
+  containerWidth: {
     position: 'absolute',
     top: 0,
     right: -9,
@@ -149,21 +164,44 @@ const styles = {
     width: 16,
     cursor: 'ew-resize',
     backgroundColor: 'transparent',
-    zIndex: 1
+    zIndex: 1, // TODO(zhm) this makes scrolling the grid while hoving over the resize handles work. But it breaks IE.
+    pointerEvents: 'auto'
   },
 
-  line: {
+  containerHeight: {
+    position: 'absolute',
+    left: 0,
+    bottom: -9,
+    right: 0,
+    height: 16,
+    cursor: 'ns-resize',
+    backgroundColor: 'transparent',
+    zIndex: 1, // TODO(zhm) this makes scrolling the grid while hoving over the resize handles work. But it breaks IE.
+    pointerEvents: 'auto'
+  },
+
+  lineWidth: {
     position: 'absolute',
     left: 6,
     top: 0,
     width: 4,
     bottom: 0,
-    backgroundColor: 'yellow',
-    opacity: 0.3
+    backgroundColor: 'transparent',
+    opacity: 1
+  },
+
+  lineHeight: {
+    position: 'absolute',
+    top: 6,
+    left: 0,
+    right: 0,
+    height: 4,
+    backgroundColor: 'transparent',
+    opacity: 1
   },
 
   lineHover: {
-    backgroundColor: 'red'
+    backgroundColor: '#18a3f7'
   }
 };
 

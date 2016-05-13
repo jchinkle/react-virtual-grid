@@ -29,18 +29,27 @@ export default class Grid extends React.Component {
 
     renderCell: React.PropTypes.func,
 
-    onExtentsChange: React.PropTypes.func
+    onExtentsChange: React.PropTypes.func,
+
+    resizableColumns: React.PropTypes.bool,
+
+    resizableRows: React.PropTypes.bool
   };
 
   static defaultProps = {
     preloadPixelsX: 0,
     preloadPixelsY: 0,
     estimatedColumnWidth: 130,
-    estimatedRowHeight: 30
+    estimatedRowHeight: 30,
+    resizableColumns: true,
+    resizableRows: true
   };
 
   constructor(props) {
     super(props);
+
+    this._pinnedColumnWidths = {};
+    this._pinnedRowHeights = {};
 
     this._sizeDetector = elementResizeDetector({strategy: 'scroll'});
 
@@ -438,6 +447,18 @@ export default class Grid extends React.Component {
     this.disableScrollableAreaPointerEventsSoon();
   }
 
+  handleColumnResize = (column, width) => {
+    this._pinnedColumnWidths[column] = Math.min(10000, Math.max(20, width));
+    this.invalidateSizes();
+    this.refresh();
+  }
+
+  handleRowResize = (row, height) => {
+    this._pinnedRowHeights[row] = Math.min(10000, Math.max(20, height));
+    this.invalidateSizes();
+    this.refresh();
+  }
+
   invalidateSizes() {
     this.calculator.invalidate();
   }
@@ -499,11 +520,27 @@ export default class Grid extends React.Component {
       this._calculator.estimatedRowHeight = this.props.estimatedRowHeight;
       this._calculator.fixedColumnCount = this.props.fixedColumnCount;
       this._calculator.fixedHeaderCount = this.props.fixedHeaderCount;
-      this._calculator.calculateRowHeight = this.props.rowHeight;
-      this._calculator.calculateColumnWidth = this.props.columnWidth;
+      this._calculator.calculateRowHeight = this.calculateRowHeight;
+      this._calculator.calculateColumnWidth = this.calculateColumnWidth;
     }
 
     return this._calculator;
+  }
+
+  calculateRowHeight = (row) => {
+    if (this._pinnedRowHeights[row] != null) {
+      return this._pinnedRowHeights[row];
+    }
+
+    return this.props.rowHeight(row);
+  }
+
+  calculateColumnWidth = (column) => {
+    if (this._pinnedColumnWidths[column] != null) {
+      return this._pinnedColumnWidths[column];
+    }
+
+    return this.props.columnWidth(column);
   }
 
   renderCellRange(fromRow, toRow, fromColumn, toColumn, rows, columns) {
@@ -516,7 +553,7 @@ export default class Grid extends React.Component {
         const rowData = rows[row - fromRow];
         const columnData = columns[column - fromColumn];
 
-        cells.push(render(row, rowData, column, columnData));
+        cells.push(render(row, rowData, column, columnData, this));
       }
     }
 
@@ -531,7 +568,7 @@ const styles = {
     top: 0,
     right: 0,
     bottom: 0,
-    zIndex: 1
+    zIndex: 2
   },
 
   scrollOverlay: {
@@ -540,7 +577,7 @@ const styles = {
     top: 0,
     right: 0,
     bottom: 0,
-    zIndex: 1,
+    zIndex: 2,
     overflow: 'hidden',
     pointerEvents: 'none'
   },
