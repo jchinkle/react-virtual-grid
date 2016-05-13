@@ -438,6 +438,16 @@ export default class Grid extends React.Component {
     this.disableScrollableAreaPointerEventsSoon();
   }
 
+  invalidateSizes() {
+    this.calculator.invalidate();
+  }
+
+  refresh = () => {
+    const {scrollTop, scrollLeft} = this._scrollInner;
+
+    this.update(scrollTop, scrollLeft);
+  }
+
   update(scrollTop, scrollLeft) {
     const x = scrollLeft - this.props.preloadPixelsX;
     const y = scrollTop - this.props.preloadPixelsY;
