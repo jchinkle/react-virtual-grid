@@ -164,7 +164,7 @@ const styles = {
     width: 16,
     cursor: 'ew-resize',
     backgroundColor: 'transparent',
-    zIndex: 1, // TODO(zhm) this makes scrolling the grid while hoving over the resize handles work. But it breaks IE.
+    // zIndex: 1, TODO(zhm) IE10 seems to need this zIndex to receive any mouse events, I think it ends up below everything somehow
     pointerEvents: 'auto'
   },
 
@@ -176,7 +176,7 @@ const styles = {
     height: 16,
     cursor: 'ns-resize',
     backgroundColor: 'transparent',
-    zIndex: 1, // TODO(zhm) this makes scrolling the grid while hoving over the resize handles work. But it breaks IE.
+    // zIndex: 1,
     pointerEvents: 'auto'
   },
 

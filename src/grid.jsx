@@ -83,6 +83,10 @@ export default class Grid extends React.Component {
       <div style={styles.container}
            ref={this.bindRoot}
            onMouseMove={this.handleRootMouseMove}>
+        <div style={styles.gridBody}>
+          {this.renderLeftPane()}
+          {this.renderRightPane()}
+        </div>
         <div style={styles.scrollOverlay}
              ref={this.bindScrollOverlay}>
           <div style={styles.scrollContainer}
@@ -91,11 +95,6 @@ export default class Grid extends React.Component {
                  style={contentStyle}>
             </div>
           </div>
-        </div>
-
-        <div style={styles.gridBody}>
-          {this.renderLeftPane()}
-          {this.renderRightPane()}
         </div>
       </div>
     );
@@ -548,8 +547,10 @@ export default class Grid extends React.Component {
 
     const render = this.props.renderCell;
 
-    for (let row = fromRow; row <= toRow; ++row) {
-      for (let column = fromColumn; column <= toColumn; ++column) {
+    // for (let row = fromRow; row <= toRow; ++row) {
+    //   for (let column = fromColumn; column <= toColumn; ++column) {
+    for (let row = toRow; row >= fromRow; --row) {
+      for (let column = toColumn; column >= fromColumn; --column) {
         const rowData = rows[row - fromRow];
         const columnData = columns[column - fromColumn];
 
@@ -567,8 +568,8 @@ const styles = {
     left: 0,
     top: 0,
     right: 0,
-    bottom: 0,
-    zIndex: 2
+    bottom: 0
+    // zIndex: 2
   },
 
   scrollOverlay: {
@@ -577,7 +578,7 @@ const styles = {
     top: 0,
     right: 0,
     bottom: 0,
-    zIndex: 2,
+    // zIndex: 2,
     overflow: 'hidden',
     pointerEvents: 'none'
   },
