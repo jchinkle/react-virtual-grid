@@ -198,6 +198,12 @@ var Grid = function (_React$Component) {
         onMouseMove: this.handleRootMouseMove },
       _react2.default.createElement(
         'div',
+        { style: styles.gridBody },
+        this.renderLeftPane(),
+        this.renderRightPane()
+      ),
+      _react2.default.createElement(
+        'div',
         { style: styles.scrollOverlay,
           ref: this.bindScrollOverlay },
         _react2.default.createElement(
@@ -207,12 +213,6 @@ var Grid = function (_React$Component) {
           _react2.default.createElement('div', { className: (0, _classnames2.default)(styles.scrollContent),
             style: contentStyle })
         )
-      ),
-      _react2.default.createElement(
-        'div',
-        { style: styles.gridBody },
-        this.renderLeftPane(),
-        this.renderRightPane()
       )
     );
   };
@@ -495,8 +495,10 @@ var Grid = function (_React$Component) {
 
     var render = this.props.renderCell;
 
-    for (var row = fromRow; row <= toRow; ++row) {
-      for (var column = fromColumn; column <= toColumn; ++column) {
+    // for (let row = fromRow; row <= toRow; ++row) {
+    //   for (let column = fromColumn; column <= toColumn; ++column) {
+    for (var row = toRow; row >= fromRow; --row) {
+      for (var column = toColumn; column >= fromColumn; --column) {
         var rowData = rows[row - fromRow];
         var columnData = columns[column - fromColumn];
 
@@ -635,8 +637,8 @@ var styles = {
     left: 0,
     top: 0,
     right: 0,
-    bottom: 0,
-    zIndex: 2
+    bottom: 0
+    // zIndex: 2
   },
 
   scrollOverlay: {
@@ -645,7 +647,7 @@ var styles = {
     top: 0,
     right: 0,
     bottom: 0,
-    zIndex: 2,
+    // zIndex: 2,
     overflow: 'hidden',
     pointerEvents: 'none'
   },
