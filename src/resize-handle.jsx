@@ -187,7 +187,8 @@ const styles = {
     width: 4,
     bottom: 0,
     backgroundColor: 'transparent',
-    opacity: 1
+    opacity: 1,
+    borderRadius: 0
   },
 
   lineHeight: {
@@ -197,7 +198,8 @@ const styles = {
     right: 0,
     height: 4,
     backgroundColor: 'transparent',
-    opacity: 1
+    opacity: 1,
+    borderRadius: 0
   },
 
   lineHover: {

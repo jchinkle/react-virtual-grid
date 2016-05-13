@@ -86,6 +86,8 @@ export default class Grid extends React.Component {
         <div style={styles.gridBody}>
           {this.renderLeftPane()}
           {this.renderRightPane()}
+          {this.renderColumnResizeGuide()}
+          {this.renderRowResizeGuide()}
         </div>
         <div style={styles.scrollOverlay}
              ref={this.bindScrollOverlay}>
@@ -287,6 +289,48 @@ export default class Grid extends React.Component {
     );
   }
 
+  renderColumnResizeGuide() {
+    if (this._resizingColumn == null) {
+      return null;
+    }
+
+    const {styles} = Grid;
+
+    const column = this.state.cells.columns.find((cell) => {
+      return cell[0] === this._resizingColumn;
+    });
+
+    const guideStyle = {
+      ...styles.columnResizeGuide,
+      left: -this._scrollInner.scrollLeft + column[1] + column[2] - 2
+    };
+
+    return (
+      <div style={guideStyle}></div>
+    );
+  }
+
+  renderRowResizeGuide() {
+    if (this._resizingRow == null) {
+      return null;
+    }
+
+    const {styles} = Grid;
+
+    const row = this.state.cells.rows.find((cell) => {
+      return cell[0] === this._resizingRow;
+    });
+
+    const guideStyle = {
+      ...styles.rowResizeGuide,
+      top: -this._scrollInner.scrollTop + row[1] + row[2] - 2
+    };
+
+    return (
+      <div style={guideStyle}></div>
+    );
+  }
+
   get scrollableWidth() {
     if (!this.state.cells || !this.state.cells.columns.length) {
       return this.props.estimatedColumnWidth * this.props.columnCount;
@@ -446,14 +490,44 @@ export default class Grid extends React.Component {
     this.disableScrollableAreaPointerEventsSoon();
   }
 
+  handleColumnResizeStart = (column, width) => {
+    this._resizingColumn = column;
+
+    // this._pinnedColumnWidths[column] = Math.min(10000, Math.max(20, width));
+    this.invalidateSizes();
+    this.refresh();
+  }
+
   handleColumnResize = (column, width) => {
     this._pinnedColumnWidths[column] = Math.min(10000, Math.max(20, width));
     this.invalidateSizes();
     this.refresh();
   }
 
+  handleColumnResizeEnd = () => {
+    this._resizingColumn = null;
+
+    this.invalidateSizes();
+    this.refresh();
+  }
+
+  handleRowResizeStart = (row, height) => {
+    this._resizingRow = row;
+
+    // this._pinnedRowHeights[row] = Math.min(10000, Math.max(20, height));
+    this.invalidateSizes();
+    this.refresh();
+  }
+
   handleRowResize = (row, height) => {
     this._pinnedRowHeights[row] = Math.min(10000, Math.max(20, height));
+    this.invalidateSizes();
+    this.refresh();
+  }
+
+  handleRowResizeEnd = () => {
+    this._resizingRow = null;
+
     this.invalidateSizes();
     this.refresh();
   }
@@ -605,6 +679,26 @@ const styles = {
   pane: {
     position: 'absolute',
     overflow: 'hidden'
+  },
+
+  columnResizeGuide: {
+    position: 'absolute',
+    top: 1,
+    bottom: 0,
+    width: 4,
+    backgroundColor: '#18a3f7',
+    cursor: 'ew-resize',
+    borderRadius: 0
+  },
+
+  rowResizeGuide: {
+    position: 'absolute',
+    left: 1,
+    right: 0,
+    height: 4,
+    backgroundColor: '#18a3f7',
+    cursor: 'ns-resize',
+    borderRadius: 0
   }
 };
 
