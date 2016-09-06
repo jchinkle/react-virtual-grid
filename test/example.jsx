@@ -19,8 +19,9 @@ export default class Example extends React.Component {
     this.state = {
       columnCount: 4096,
       rowCount: 4096,
-      fixedColumnCount: 1,
-      fixedHeaderCount: 1
+      fixedColumnCount: 2,
+      fixedHeaderCount: 2,
+      fixedFooterCount: 2
     };
   }
 
@@ -39,6 +40,7 @@ export default class Example extends React.Component {
               estimatedRowHeight={rowHeight}
               fixedColumnCount={this.state.fixedColumnCount}
               fixedHeaderCount={this.state.fixedHeaderCount}
+              fixedFooterCount={this.state.fixedFooterCount}
               renderCell={this.renderCell}
               columnWidth={this.calculateColumnWidth}
               rowHeight={this.calculateRowHeight} />
@@ -67,13 +69,15 @@ export default class Example extends React.Component {
     const [ r, g, b ] = toColor(16777215 - cellNumber);
 
     const backgroundColor = 'rgb(' + r + ',' + g + ',' + b + ')';
+    // const backgroundColor = 'transparent';
 
     const left = column < 1 ? 0 : colLeft;
     const top = row < 1 ? 0 : rowTop;
 
     const attrs = { left, top, width, height, backgroundColor };
 
-    const title = '#' + (16777215 - cellNumber).toString(16);
+    const color = '#' + (16777215 - cellNumber).toString(16);
+    const title = rowIndex + '-' + colIndex + ' (' + color + ')';
 
     const classes = cx(styles.cell,
                        column === this.state.fixedColumnCount && styles.cellLeft);
@@ -89,11 +93,11 @@ export default class Example extends React.Component {
 const styles = cssInJS({
   container: {
     position: 'absolute',
-    left: 0,
-    top: 0,
-    right: 0,
-    bottom: 0,
-    border: 'none',
+    left: 50,
+    top: 50,
+    right: 50,
+    bottom: 50,
+    border: '3px solid #000',
     boxSizing: 'border-box',
     overflow: 'hidden'
   },

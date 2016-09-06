@@ -13,7 +13,7 @@
     "watch": "node_modules/.bin/babel src --out-dir dist --source-maps --watch",
     "watch-test": "node_modules/.bin/watchify --verbose -t envify -t babelify -t reactify --extension='.jsx' -g envify -s Fulcrum test/index.js -o dist/test.js",
     "clean": "rm -rf dist && mkdir -p dist",
-    "serve": "./node_modules/.bin/serve -p 4001",
+    "serve": "./node_modules/.bin/serve -p 4007",
     "check-deps": "node_modules/.bin/ncu",
     "update-deps": "node_modules/.bin/ncu -u"
   },
