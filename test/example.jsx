@@ -2,6 +2,8 @@ import React from 'react';
 import cx from 'classnames';
 import Grid from '../src/grid';
 
+const CELL_SIZE = 64;
+
 function toColor(number) {
   const num = number >>> 0;
 
@@ -17,8 +19,8 @@ export default class Example extends React.Component {
     super(props);
 
     this.state = {
-      columnCount: 100000,
-      rowCount: 100000,
+      columnCount: 500000,
+      rowCount: 500000,
       fixedLeftColumnCount: 1,
       fixedRightColumnCount: 1,
       fixedHeaderCount: 1,
@@ -29,8 +31,8 @@ export default class Example extends React.Component {
   render() {
     const {styles} = Example;
 
-    const rowHeight = 32;
-    const columnWidth = 128;
+    const rowHeight = CELL_SIZE;
+    const columnWidth = CELL_SIZE;
 
     return (
       <div className={cx('table-view', styles.container)}>
@@ -51,11 +53,11 @@ export default class Example extends React.Component {
   }
 
   calculateColumnWidth = (column) => {
-    return 128;
+    return CELL_SIZE;
   }
 
   calculateRowHeight = (row) => {
-    return 32;
+    return CELL_SIZE;
   }
 
   renderCell = (row, rowData, column, columnData) => {
@@ -64,11 +66,9 @@ export default class Example extends React.Component {
 
     const {styles} = Example;
 
-    const cellNumber = (rowIndex * this.state.columnCount) + colIndex;
+    const backgroundColor = 'transparent';
 
-    const [ r, g, b ] = toColor(16777215 - cellNumber);
-
-    const backgroundColor = 'rgb(' + r + ',' + g + ',' + b + ')';
+    const isFixed = column === 0 || row === 0 || column === this.state.columnCount - 1 || row === this.state.rowCount - 1;
 
     const left = column < 1 ? 0 : colLeft;
     const top = row < 1 ? 0 : rowTop;
@@ -79,7 +79,14 @@ export default class Example extends React.Component {
 
     const classes = cx(styles.cell,
                        column === 0 && styles.cellLeft,
-                       row === this.state.rowCount - 1 && styles.cellBottom);
+                       column === 1 && styles.bodyLeft,
+                       row === 0 && column > 1 && styles.cellTop,
+                       row === 0 && column === 1 && styles.cellTopFirst,
+                       row === this.state.rowCount - 1 && column > 1 && styles.cellBottom,
+                       row === this.state.rowCount - 1 && column === 0 && styles.cellBottomFixed,
+                       row === this.state.rowCount - 1 && column === 1 && styles.cellBottomFirst,
+                       column === this.state.columnCount - 1 && styles.cellRight,
+                       isFixed && styles.fixed);
 
     return (
       <div key={rowIndex + '-' + colIndex}
@@ -91,12 +98,13 @@ export default class Example extends React.Component {
 
 const styles = cssInJS({
   container: {
+    backgroundColor: 'black',
     position: 'absolute',
-    left: 20,
-    top: 50,
-    right: 20,
-    bottom: 20,
-    border: '1px solid #000',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    border: '1px solid transparent',
     boxSizing: 'border-box',
     overflow: 'hidden'
   },
@@ -104,24 +112,60 @@ const styles = cssInJS({
   cell: {
     position: 'absolute',
     overflow: 'hidden',
-    borderBottom: '1px solid #000',
-    borderLeft: '1px solid #000',
+    borderBottom: '1px solid #1D9DF9',
+    borderLeft: '1px solid #1D9DF9',
     borderRight: '1px solid transparent',
     borderTop: '1px solid transparent',
     padding: 3,
     textAlign: 'center',
     fontFamily: 'sans-serif',
-    paddingTop: 8,
-    fontSize: 12,
-    boxSizing: 'border-box'
+    paddingTop: 23,
+    fontSize: 10,
+    boxSizing: 'border-box',
+    color: '#1D9DF9'
   },
 
-  cellLeft: {
+  fixed: {
+    color: '#F8A104'
+  },
+
+  bodyLeft: {
     borderLeft: '1px solid transparent'
   },
 
+  cellTopFirst: {
+    borderBottom: '1px solid #F8A104'
+  },
+
+  cellTop: {
+    borderBottom: '1px solid #F8A104',
+    borderLeft: '1px solid #F8A104'
+  },
+
+  cellLeft: {
+    borderRight: '1px solid #F8A104',
+    borderBottom: '1px solid #F8A104',
+    borderLeft: '1px solid #F8A104'
+  },
+
+  cellRight: {
+    borderLeft: '1px solid #F8A104',
+    borderBottom: '1px solid #F8A104',
+    borderRight: '1px solid #F8A104'
+  },
+
+  cellBottomFixed: {
+    borderTop: '1px solid #F8A104'
+  },
+
+  cellBottomFirst: {
+    borderTop: '1px solid #F8A104',
+    borderBottom: '1px solid transparent'
+  },
+
   cellBottom: {
-    borderTop: '1px solid #000',
+    borderTop: '1px solid #F8A104',
+    borderLeft: '1px solid #F8A104',
     borderBottom: '1px solid transparent'
   }
 });
