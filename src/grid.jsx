@@ -19,7 +19,9 @@ export default class Grid extends React.Component {
 
     rowCount: React.PropTypes.number.isRequired,
 
-    fixedColumnCount: React.PropTypes.number,
+    fixedLeftColumnCount: React.PropTypes.number,
+
+    fixedRightColumnCount: React.PropTypes.number,
 
     fixedHeaderCount: React.PropTypes.number,
 
@@ -41,6 +43,8 @@ export default class Grid extends React.Component {
   static defaultProps = {
     preloadPixelsX: 0,
     preloadPixelsY: 0,
+    fixedLeftColumnCount: 0,
+    fixedRightColumnCount: 0,
     fixedHeaderCount: 0,
     fixedFooterCount: 0,
     estimatedColumnWidth: 130,
@@ -90,6 +94,7 @@ export default class Grid extends React.Component {
         <div style={styles.gridBody}>
           {this.renderLeftPane()}
           {this.renderRightPane()}
+          {this.renderCenterPane()}
           {this.renderColumnResizeGuide()}
           {this.renderRowResizeGuide()}
         </div>
@@ -97,7 +102,7 @@ export default class Grid extends React.Component {
              ref={this.bindScrollOverlay}>
           <div style={styles.scrollContainer}
                ref={this.bindScrollInner}>
-            <div className={cx(styles.scrollContent)}
+            <div className={cx('scroll-container', styles.scrollContent)}
                  style={contentStyle}>
             </div>
           </div>
@@ -114,7 +119,7 @@ export default class Grid extends React.Component {
       left: 0,
       top: 0,
       bottom: 0,
-      width: this.fixedColumnsWidth
+      width: this.fixedLeftColumnsWidth
     };
 
     return (
@@ -129,7 +134,7 @@ export default class Grid extends React.Component {
   }
 
   renderLeftPaneHeader() {
-    if (!this.state.cells || this.props.fixedColumnCount < 1) {
+    if (!this.state.cells || this.props.fixedLeftColumnCount < 1) {
       return null;
     }
 
@@ -152,14 +157,14 @@ export default class Grid extends React.Component {
            style={attrs}>
         <div className={cx(styles.leftPaneHeaderContent)}
              style={contentStyle}>
-          {this.renderCellRange(0, this.props.fixedHeaderCount - 1, 0, this.props.fixedColumnCount - 1, this.state.cells.topLeftRows, this.state.cells.topLeftColumns)}
+          {this.renderCellRange(0, this.props.fixedHeaderCount - 1, 0, this.props.fixedLeftColumnCount - 1, this.state.cells.topLeftRows, this.state.cells.topLeftColumns)}
         </div>
       </div>
     );
   }
 
   renderLeftPaneFooter() {
-    if (!this.state.cells || this.props.fixedColumnCount < 1 || this.props.fixedFooterCount < 1) {
+    if (!this.state.cells || this.props.fixedLeftColumnCount < 1 || this.props.fixedFooterCount < 1) {
       return null;
     }
 
@@ -185,14 +190,145 @@ export default class Grid extends React.Component {
            style={attrs}>
         <div className={cx(styles.leftPaneFooterContent)}
              style={contentStyle}>
-          {this.renderCellRange(fromRow, toRow, 0, this.props.fixedColumnCount - 1, this.state.cells.bottomLeftRows, this.state.cells.bottomLeftColumns)}
+          {this.renderCellRange(fromRow, toRow, 0, this.props.fixedLeftColumnCount - 1, this.state.cells.bottomLeftRows, this.state.cells.bottomLeftColumns)}
         </div>
       </div>
     );
   }
 
   renderLeftPaneBody() {
-    if (!this.state.cells || this.props.fixedColumnCount < 1) {
+    if (!this.state.cells || this.props.fixedLeftColumnCount < 1) {
+      return null;
+    }
+
+    const {styles} = Grid;
+
+    const attrs = {
+      ...styles.pane,
+      left: 0,
+      top: this.fixedHeadersHeight,
+      right: 0,
+      bottom: this.fixedFootersHeight
+    };
+
+    const contentStyle = {
+      position: 'absolute',
+      width: this.props.estimatedColumnWidth,
+      height: this.props.estimatedRowHeight * this.props.rowCount
+    };
+
+    const fromRow = this.state.cells.leftRows.length ? this.state.cells.leftRows[0][0] : null;
+    const toRow = this.state.cells.leftRows.length ? this.state.cells.leftRows[this.state.cells.leftRows.length - 1][0] : null;
+
+    return (
+      <div ref={this.bindLeftPaneBody}
+           className={cx()}
+           style={attrs}>
+        <div className={cx(styles.leftPaneBodyContent)}
+             style={contentStyle}>
+          {this.renderCellRange(fromRow, toRow, 0, this.props.fixedLeftColumnCount - 1, this.state.cells.leftRows, this.state.cells.leftColumns)}
+        </div>
+      </div>
+    );
+  }
+
+  renderRightPane() {
+    if (!this.state.cells || this.props.fixedRightColumnCount < 1) {
+      return null;
+    }
+
+    const {styles} = Grid;
+
+    const attrs = {
+      ...styles.pane,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      width: this.fixedRightColumnsWidth
+    };
+
+    return (
+      <div ref={this.bindRightPane}
+           className={cx()}
+           style={attrs}>
+        {this.renderRightPaneHeader()}
+        {this.renderRightPaneFooter()}
+        {this.renderRightPaneBody()}
+      </div>
+    );
+  }
+
+  renderRightPaneHeader() {
+    if (!this.state.cells || this.props.fixedRightColumnCount < 1) {
+      return null;
+    }
+
+    const {styles} = Grid;
+
+    const attrs = {
+      ...styles.pane,
+      left: 0,
+      top: 0,
+      right: 0,
+      height: this.fixedHeadersHeight
+    };
+
+    const contentStyle = {
+    };
+
+    const fromColumn = this.props.columnCount > 0 ? this.props.columnCount - this.props.fixedRightColumnCount : 0;
+    const toColumn = fromColumn ? fromColumn + this.props.fixedRightColumnCount - 1 : null;
+
+    return (
+      <div ref={this.bindRightPaneHeader}
+           className={cx()}
+           style={attrs}>
+        <div className={cx(styles.rightPaneHeaderContent)}
+             style={contentStyle}>
+          {this.renderCellRange(0, this.props.fixedHeaderCount - 1, fromColumn, toColumn, this.state.cells.topRightRows, this.state.cells.topRightColumns)}
+        </div>
+      </div>
+    );
+  }
+
+  renderRightPaneFooter() {
+    if (!this.state.cells || this.props.fixedRightColumnCount < 1 || this.props.fixedFooterCount < 1) {
+      return null;
+    }
+
+    const {styles} = Grid;
+
+    const attrs = {
+      ...styles.pane,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      height: this.fixedFootersHeight
+    };
+
+    const contentStyle = {
+    };
+
+    const fromRow = this.props.rowCount > 0 ? this.props.rowCount - this.props.fixedFooterCount : 0;
+    const toRow = fromRow ? fromRow + this.props.fixedFooterCount - 1 : null;
+
+    const fromColumn = this.props.columnCount > 0 ? this.props.columnCount - this.props.fixedRightColumnCount : 0;
+    const toColumn = fromColumn ? fromColumn + this.props.fixedRightColumnCount - 1 : null;
+
+    return (
+      <div ref={this.bindRightPaneFooter}
+           className={cx()}
+           style={attrs}>
+        <div className={cx(styles.rightPaneFooterContent)}
+             style={contentStyle}>
+          {this.renderCellRange(fromRow, toRow, fromColumn, toColumn, this.state.cells.bottomRightRows, this.state.cells.bottomRightColumns)}
+        </div>
+      </div>
+    );
+  }
+
+  renderRightPaneBody() {
+    if (!this.state.cells || this.props.fixedRightColumnCount < 1) {
       return null;
     }
 
@@ -214,44 +350,47 @@ export default class Grid extends React.Component {
       bottom: -this.fixedFootersHeight
     };
 
+    const fromColumn = this.props.columnCount > 0 ? this.props.columnCount - this.props.fixedRightColumnCount : 0;
+    const toColumn = fromColumn ? fromColumn + this.props.fixedRightColumnCount - 1 : null;
+
     const fromRow = this.state.cells.leftRows.length ? this.state.cells.leftRows[0][0] : null;
     const toRow = this.state.cells.leftRows.length ? this.state.cells.leftRows[this.state.cells.leftRows.length - 1][0] : null;
 
     return (
-      <div ref={this.bindLeftPaneBody}
+      <div ref={this.bindRightPaneBody}
            className={cx()}
            style={attrs}>
-        <div className={cx(styles.leftPaneBodyContent)}
+        <div className={cx(styles.rightPaneBodyContent)}
              style={contentStyle}>
-          {this.renderCellRange(fromRow, toRow, 0, this.props.fixedColumnCount - 1, this.state.cells.leftRows, this.state.cells.leftColumns)}
+          {this.renderCellRange(fromRow, toRow, fromColumn, toColumn, this.state.cells.rightRows, this.state.cells.rightColumns)}
         </div>
       </div>
     );
   }
 
-  renderRightPane() {
+  renderCenterPane() {
     const {styles} = Grid;
 
     const attrs = {
       ...styles.pane,
-      left: this.fixedColumnsWidth,
+      left: this.fixedLeftColumnsWidth,
       top: 0,
       bottom: 0,
-      right: 0
+      right: this.fixedRightColumnsWidth
     };
 
     return (
-      <div ref={this.bindRightPane}
+      <div ref={this.bindCenterPane}
            className={cx()}
            style={attrs}>
-        {this.renderRightPaneHeader()}
-        {this.renderRightPaneFooter()}
-        {this.renderRightPaneBody()}
+        {this.renderCenterPaneHeader()}
+        {this.renderCenterPaneFooter()}
+        {this.renderCenterPaneBody()}
       </div>
     );
   }
 
-  renderRightPaneHeader() {
+  renderCenterPaneHeader() {
     if (!this.state.cells || this.props.fixedHeaderCount < 1) {
       return null;
     }
@@ -271,17 +410,17 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight,
-      left: -this.fixedColumnsWidth
+      left: -this.fixedLeftColumnsWidth
     };
 
     const fromColumn = this.state.cells.topColumns.length ? this.state.cells.topColumns[0][0] : null;
     const toColumn = this.state.cells.topColumns.length ? this.state.cells.topColumns[this.state.cells.topColumns.length - 1][0] : null;
 
     return (
-      <div ref={this.bindRightPaneHeader}
+      <div ref={this.bindCenterPaneHeader}
            className={cx()}
            style={attrs}>
-        <div className={cx(styles.rightPaneHeaderContent)}
+        <div className={cx(styles.centerPaneHeaderContent)}
              style={contentStyle}>
           {this.renderCellRange(0, this.props.fixedHeaderCount - 1, fromColumn, toColumn, this.state.cells.topRows, this.state.cells.topColumns)}
         </div>
@@ -289,7 +428,7 @@ export default class Grid extends React.Component {
     );
   }
 
-  renderRightPaneFooter() {
+  renderCenterPaneFooter() {
     if (!this.state.cells || this.props.fixedFooterCount < 1) {
       return null;
     }
@@ -309,7 +448,7 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight,
-      left: -this.fixedColumnsWidth
+      left: -this.fixedLeftColumnsWidth
     };
 
     const fromColumn = this.state.cells.bottomColumns.length ? this.state.cells.bottomColumns[0][0] : null;
@@ -319,10 +458,10 @@ export default class Grid extends React.Component {
     const toRow = fromRow ? fromRow + this.props.fixedFooterCount - 1 : null;
 
     return (
-      <div ref={this.bindRightPaneFooter}
+      <div ref={this.bindCenterPaneFooter}
            className={cx()}
            style={attrs}>
-        <div className={cx(styles.rightPaneHeaderContent)}
+        <div className={cx(styles.centerPaneHeaderContent)}
              style={contentStyle}>
           {this.renderCellRange(fromRow, toRow, fromColumn, toColumn, this.state.cells.bottomRows, this.state.cells.bottomColumns)}
         </div>
@@ -330,7 +469,7 @@ export default class Grid extends React.Component {
     );
   }
 
-  renderRightPaneBody() {
+  renderCenterPaneBody() {
     if (!this.state.cells) {
       return null;
     }
@@ -349,7 +488,7 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight * this.props.rowCount,
-      left: -this.fixedColumnsWidth,
+      left: -this.fixedLeftColumnsWidth,
       top: -this.fixedHeadersHeight
     };
 
@@ -360,10 +499,10 @@ export default class Grid extends React.Component {
     const toColumn = this.state.cells.columns.length ? this.state.cells.columns[this.state.cells.columns.length - 1][0] : null;
 
     return (
-      <div ref={this.bindRightPaneBody}
+      <div ref={this.bindCenterPaneBody}
            className={cx()}
            style={attrs}>
-        <div className={cx(styles.rightPaneBodyContent)}
+        <div className={cx(styles.centerPaneBodyContent)}
              style={contentStyle}>
           {this.renderCellRange(fromRow, toRow, fromColumn, toColumn, this.state.cells.rows, this.state.cells.columns)}
         </div>
@@ -421,7 +560,7 @@ export default class Grid extends React.Component {
     const lastColumn = this.state.cells.columns[this.state.cells.columns.length - 1];
     const width = lastColumn[1] + lastColumn[2];
 
-    return width + ((this.props.columnCount - lastColumn[0] - 1) * this.props.estimatedColumnWidth);
+    return width + (((this.props.columnCount - 1) - lastColumn[0]) * this.props.estimatedColumnWidth);
   }
 
   get scrollableHeight() {
@@ -432,7 +571,7 @@ export default class Grid extends React.Component {
     const lastRow = this.state.cells.rows[this.state.cells.rows.length - 1];
     const height = lastRow[1] + lastRow[2];
 
-    return height + ((this.props.rowCount - lastRow[0] - 1) * this.props.estimatedRowHeight);
+    return height + (((this.props.rowCount - 1) - lastRow[0]) * this.props.estimatedRowHeight);
   }
 
   get fixedHeadersHeight() {
@@ -457,15 +596,26 @@ export default class Grid extends React.Component {
     return lastBottomRowTop;
   }
 
-  get fixedColumnsWidth() {
+  get fixedRightColumnsWidth() {
+    if (!this.state.cells || this.state.cells.rightColumns.length === 0) {
+      return 0;
+    }
+
+    const lastColumn = this.state.cells.rightColumns[this.state.cells.rightColumns.length - 1];
+    const lastOffset = lastColumn[1] + lastColumn[2];
+
+    return lastOffset;
+  }
+
+  get fixedLeftColumnsWidth() {
     if (!this.state.cells || !this.state.cells.leftColumns.length) {
       return 0;
     }
 
-    const lastLeftColumn = this.state.cells.leftColumns[this.state.cells.leftColumns.length - 1];
-    const leftOffset = lastLeftColumn[1] + lastLeftColumn[2];
+    const lastColumn = this.state.cells.leftColumns[this.state.cells.leftColumns.length - 1];
+    const lastOffset = lastColumn[1] + lastColumn[2];
 
-    return leftOffset;
+    return lastOffset;
   }
 
   get scrollbarSize() {
@@ -568,6 +718,22 @@ export default class Grid extends React.Component {
 
   bindRightPaneBody = (node) => {
     this._rightPaneBody = node;
+  }
+
+  bindCenterPane = (node) => {
+    this._centerPane = node;
+  }
+
+  bindCenterPaneHeader = (node) => {
+    this._centerPaneHeader = node;
+  }
+
+  bindCenterPaneFooter = (node) => {
+    this._centerPaneFooter = node;
+  }
+
+  bindCenterPaneBody = (node) => {
+    this._centerPaneBody = node;
   }
 
   handleResize = (event) => {
@@ -679,16 +845,20 @@ export default class Grid extends React.Component {
       this._leftPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
     }
 
-    if (this._rightPaneHeader) {
-      this._rightPaneHeader.childNodes[0].style.left = (-x - this.fixedColumnsWidth) + 'px';
+    if (this._rightPaneBody) {
+      this._rightPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
     }
 
-    if (this._rightPaneFooter) {
-      this._rightPaneFooter.childNodes[0].style.left = (-x - this.fixedColumnsWidth) + 'px';
+    if (this._centerPaneHeader) {
+      this._centerPaneHeader.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
     }
 
-    this._rightPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
-    this._rightPaneBody.childNodes[0].style.left = (-x - this.fixedColumnsWidth) + 'px';
+    if (this._centerPaneFooter) {
+      this._centerPaneFooter.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
+    }
+
+    this._centerPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+    this._centerPaneBody.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
   }
 
   get calculator() {
@@ -696,7 +866,8 @@ export default class Grid extends React.Component {
       this._calculator = new GridCalculator();
       this._calculator.estimatedColumnWidth = this.props.estimatedColumnWidth;
       this._calculator.estimatedRowHeight = this.props.estimatedRowHeight;
-      this._calculator.fixedColumnCount = this.props.fixedColumnCount;
+      this._calculator.fixedLeftColumnCount = this.props.fixedLeftColumnCount;
+      this._calculator.fixedRightColumnCount = this.props.fixedRightColumnCount;
       this._calculator.fixedHeaderCount = this.props.fixedHeaderCount;
       this._calculator.fixedFooterCount = this.props.fixedFooterCount;
       this._calculator.calculateRowHeight = this.calculateRowHeight;
@@ -727,8 +898,6 @@ export default class Grid extends React.Component {
 
     const render = this.props.renderCell;
 
-    // for (let row = fromRow; row <= toRow; ++row) {
-    //   for (let column = fromColumn; column <= toColumn; ++column) {
     for (let row = toRow; row >= fromRow; --row) {
       for (let column = toColumn; column >= fromColumn; --column) {
         const rowData = rows[row - fromRow];
@@ -749,7 +918,6 @@ const styles = {
     top: 0,
     right: 0,
     bottom: 0
-    // zIndex: 2
   },
 
   scrollOverlay: {
@@ -758,7 +926,6 @@ const styles = {
     top: 0,
     right: 0,
     bottom: 0,
-    // zIndex: 2,
     overflow: 'hidden',
     pointerEvents: 'none'
   },

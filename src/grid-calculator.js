@@ -3,8 +3,13 @@ export default class GridCalculator {
     this.invalidate();
   }
 
-  set fixedColumnCount(count) {
-    this._fixedColumnCount = count;
+  set fixedLeftColumnCount(count) {
+    this._fixedLeftColumnCount = count;
+    this.invalidate();
+  }
+
+  set fixedRightColumnCount(count) {
+    this._fixedRightColumnCount = count;
     this.invalidate();
   }
 
@@ -77,8 +82,8 @@ export default class GridCalculator {
     const sizes = [];
     let pixel = 0;
 
-    for (let index = fixedCellCount; index > 0; --index) {
-      const cellIndex = maxCells - index - 1;
+    for (let count = fixedCellCount; count > 0; --count) {
+      const cellIndex = maxCells - count;
 
       const size = this.getSize(cellIndex, cache, calculateSize, estimatedSize);
 
@@ -97,8 +102,14 @@ export default class GridCalculator {
     let lastBottomRow = null;
     let lastBottomRowTop = 0;
 
+    let lastRightColumn = null;
+    let lastRightColumnLeft = 0;
+
     let lastTopColumn = null;
     let lastTopColumnRight = 0;
+
+    const scrollableRowCount = rowCount;
+    const scrollableColumnCount = columnCount;
 
     // fixed-top-left
     const topLeftRows = this.cellsWithinRange(0,
@@ -112,7 +123,7 @@ export default class GridCalculator {
                                                  1e9,
                                                  this._estimatedColumnWidth,
                                                  this._widthCache,
-                                                 this._fixedColumnCount,
+                                                 this._fixedLeftColumnCount,
                                                  this.calculateColumnWidth);
 
     // fixed-left
@@ -137,7 +148,7 @@ export default class GridCalculator {
                                                     1e9,
                                                     this._estimatedColumnWidth,
                                                     this._widthCache,
-                                                    this._fixedColumnCount,
+                                                    this._fixedLeftColumnCount,
                                                     this.calculateColumnWidth);
 
     if (bottomLeftRows.length) {
@@ -145,24 +156,64 @@ export default class GridCalculator {
       lastBottomRowTop = lastBottomRow[1] + lastBottomRow[2];
     }
 
-    // if (bottomLeftColumns.length) {
-    //   lastBottomColumn = bottomLeftColumns[bottomLeftColumns.length - 1];
-    //   lastBottomColumnW = lastBottomColumn[1] + lastBottomColumn[2];
-    // }
-
     const leftRows = this.cellsWithinRange(bounds.top + lastTopRowBottom,
                                            bounds.top + bounds.height - lastBottomRowTop,
                                            this._estimatedRowHeight,
                                            this._heightCache,
-                                           rowCount,
+                                           scrollableRowCount,
                                            this.calculateRowHeight);
 
     const leftColumns = this.cellsWithinRange(0,
                                               1e9,
                                               this._estimatedColumnWidth,
                                               this._widthCache,
-                                              this._fixedColumnCount,
+                                              this._fixedLeftColumnCount,
                                               this.calculateColumnWidth);
+
+    // fixed-top-right
+    const topRightRows = this.cellsWithinRange(0,
+                                               1e9,
+                                               this._estimatedRowHeight,
+                                               this._heightCache,
+                                               this._fixedHeaderCount,
+                                               this.calculateRowHeight);
+
+    const topRightColumns = this.fixedCellsWithinRange(this._fixedRightColumnCount,
+                                                       this._estimatedColumnWidth,
+                                                       this._widthCache,
+                                                       columnCount,
+                                                       this.calculateColumnWidth);
+
+    // fixed-bottom-left
+    const bottomRightRows = this.fixedCellsWithinRange(this._fixedFooterCount,
+                                                       this._estimatedRowHeight,
+                                                       this._heightCache,
+                                                       rowCount,
+                                                       this.calculateRowHeight);
+
+    const bottomRightColumns = this.fixedCellsWithinRange(this._fixedRightColumnCount,
+                                                          this._estimatedColumnWidth,
+                                                          this._widthCache,
+                                                          columnCount,
+                                                          this.calculateColumnWidth);
+
+    const rightRows = this.cellsWithinRange(bounds.top + lastTopRowBottom,
+                                            bounds.top + bounds.height - lastBottomRowTop,
+                                            this._estimatedRowHeight,
+                                            this._heightCache,
+                                            scrollableRowCount,
+                                            this.calculateRowHeight);
+
+    const rightColumns = this.fixedCellsWithinRange(this._fixedRightColumnCount,
+                                                    this._estimatedColumnWidth,
+                                                    this._widthCache,
+                                                    columnCount,
+                                                    this.calculateColumnWidth);
+
+    if (bottomRightColumns.length) {
+      lastRightColumn = bottomRightColumns[bottomRightColumns.length - 1];
+      lastRightColumnLeft = lastRightColumn[1] + lastRightColumn[2];
+    }
 
     // fixed-top
     const topRows = this.cellsWithinRange(0,
@@ -173,10 +224,10 @@ export default class GridCalculator {
                                           this.calculateRowHeight);
 
     const topColumns = this.cellsWithinRange(bounds.left + lastTopColumnRight,
-                                             bounds.left + bounds.width,
+                                             bounds.left + bounds.width - lastRightColumnLeft,
                                              this._estimatedColumnWidth,
                                              this._widthCache,
-                                             columnCount,
+                                             scrollableColumnCount,
                                              this.calculateColumnWidth);
 
     // scrollable cells
@@ -184,14 +235,14 @@ export default class GridCalculator {
                                        bounds.top + bounds.height - lastBottomRowTop,
                                        this._estimatedRowHeight,
                                        this._heightCache,
-                                       rowCount,
+                                       scrollableRowCount,
                                        this.calculateRowHeight);
 
     const columns = this.cellsWithinRange(bounds.left + lastTopColumnRight,
-                                          bounds.left + bounds.width,
+                                          bounds.left + bounds.width - lastRightColumnLeft,
                                           this._estimatedColumnWidth,
                                           this._widthCache,
-                                          columnCount,
+                                          scrollableColumnCount,
                                           this.calculateColumnWidth);
 
     // fixed-bottom
@@ -202,10 +253,10 @@ export default class GridCalculator {
                                                   this.calculateRowHeight);
 
     const bottomColumns = this.cellsWithinRange(bounds.left + lastTopColumnRight,
-                                                bounds.left + bounds.width,
+                                                bounds.left + bounds.width - lastRightColumnLeft,
                                                 this._estimatedColumnWidth,
                                                 this._widthCache,
-                                                columnCount,
+                                                scrollableColumnCount,
                                                 this.calculateColumnWidth);
 
     const minColumn = columns.length ? columns[0][0] : null;
@@ -233,11 +284,20 @@ export default class GridCalculator {
       topLeftRows: topLeftRows,
       topLeftColumns: topLeftColumns,
 
+      topRightRows: topRightRows,
+      topRightColumns: topRightColumns,
+
       bottomLeftRows: bottomLeftRows,
       bottomLeftColumns: bottomLeftColumns,
 
+      bottomRightRows: bottomRightRows,
+      bottomRightColumns: bottomRightColumns,
+
       leftRows: leftRows,
       leftColumns: leftColumns,
+
+      rightRows: rightRows,
+      rightColumns: rightColumns,
 
       topRows: topRows,
       topColumns: topColumns,
