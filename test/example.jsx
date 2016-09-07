@@ -17,11 +17,12 @@ export default class Example extends React.Component {
     super(props);
 
     this.state = {
-      columnCount: 4096,
-      rowCount: 4096,
-      fixedColumnCount: 2,
-      fixedHeaderCount: 2,
-      fixedFooterCount: 2
+      columnCount: 100000,
+      rowCount: 100000,
+      fixedLeftColumnCount: 1,
+      fixedRightColumnCount: 1,
+      fixedHeaderCount: 1,
+      fixedFooterCount: 1
     };
   }
 
@@ -38,7 +39,8 @@ export default class Example extends React.Component {
               rowCount={this.state.rowCount}
               estimatedColumnWidth={columnWidth}
               estimatedRowHeight={rowHeight}
-              fixedColumnCount={this.state.fixedColumnCount}
+              fixedLeftColumnCount={this.state.fixedLeftColumnCount}
+              fixedRightColumnCount={this.state.fixedRightColumnCount}
               fixedHeaderCount={this.state.fixedHeaderCount}
               fixedFooterCount={this.state.fixedFooterCount}
               renderCell={this.renderCell}
@@ -50,12 +52,10 @@ export default class Example extends React.Component {
 
   calculateColumnWidth = (column) => {
     return 128;
-    // return parseInt(128 + (((column % 256) + 1)), 10);
   }
 
   calculateRowHeight = (row) => {
     return 32;
-    // return parseInt(32 + ((row % 64) + 1), 10);
   }
 
   renderCell = (row, rowData, column, columnData) => {
@@ -69,18 +69,17 @@ export default class Example extends React.Component {
     const [ r, g, b ] = toColor(16777215 - cellNumber);
 
     const backgroundColor = 'rgb(' + r + ',' + g + ',' + b + ')';
-    // const backgroundColor = 'transparent';
 
     const left = column < 1 ? 0 : colLeft;
     const top = row < 1 ? 0 : rowTop;
 
     const attrs = { left, top, width, height, backgroundColor };
 
-    const color = '#' + (16777215 - cellNumber).toString(16);
-    const title = rowIndex + '-' + colIndex + ' (' + color + ')';
+    const title = rowIndex + '-' + colIndex;
 
     const classes = cx(styles.cell,
-                       column === this.state.fixedColumnCount && styles.cellLeft);
+                       column === 0 && styles.cellLeft,
+                       row === this.state.rowCount - 1 && styles.cellBottom);
 
     return (
       <div key={rowIndex + '-' + colIndex}
@@ -93,11 +92,11 @@ export default class Example extends React.Component {
 const styles = cssInJS({
   container: {
     position: 'absolute',
-    left: 50,
+    left: 20,
     top: 50,
-    right: 50,
-    bottom: 50,
-    border: '3px solid #000',
+    right: 20,
+    bottom: 20,
+    border: '1px solid #000',
     boxSizing: 'border-box',
     overflow: 'hidden'
   },
@@ -119,6 +118,11 @@ const styles = cssInJS({
 
   cellLeft: {
     borderLeft: '1px solid transparent'
+  },
+
+  cellBottom: {
+    borderTop: '1px solid #000',
+    borderBottom: '1px solid transparent'
   }
 });
 
