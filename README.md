@@ -1,5 +1,7 @@
 ## React Virtual Grid
 
+[Demo](http://fulcrumapp.github.io/react-virtual-grid)
+
 ![Clusters of Information](grid.jpg)
 
 High performance virtual grid. This is a low level component for building fast tables. This component does not load any data and is not intended to be a drop-in widget. Some React and purist principles might be sacrificed for maximum performance.
