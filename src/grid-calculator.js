@@ -108,8 +108,8 @@ export default class GridCalculator {
     let lastTopColumn = null;
     let lastTopColumnRight = 0;
 
-    const scrollableRowCount = rowCount;
-    const scrollableColumnCount = columnCount;
+    const scrollableRowCount = rowCount - this._fixedFooterCount;
+    const scrollableColumnCount = columnCount - this._fixedRightColumnCount;
 
     // fixed-top-left
     const topLeftRows = this.cellsWithinRange(0,
