@@ -88,8 +88,8 @@ var GridCalculator = function () {
     var lastTopColumn = null;
     var lastTopColumnRight = 0;
 
-    var scrollableRowCount = rowCount;
-    var scrollableColumnCount = columnCount;
+    var scrollableRowCount = rowCount - this._fixedFooterCount;
+    var scrollableColumnCount = columnCount - this._fixedRightColumnCount;
 
     // fixed-top-left
     var topLeftRows = this.cellsWithinRange(0, 1e9, this._estimatedRowHeight, this._heightCache, this._fixedHeaderCount, this.calculateRowHeight);
