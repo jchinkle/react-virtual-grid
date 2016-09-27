@@ -188,13 +188,13 @@ var Grid = function (_React$Component) {
       _this.refresh();
     };
 
-    _this.refresh = function () {
+    _this.refresh = function (force) {
       var _this$_scrollInner2 = _this._scrollInner;
       var scrollTop = _this$_scrollInner2.scrollTop;
       var scrollLeft = _this$_scrollInner2.scrollLeft;
 
 
-      _this.update(scrollTop, scrollLeft);
+      _this.update(scrollTop, scrollLeft, force);
     };
 
     _this.calculateRowHeight = function (row) {
@@ -764,7 +764,7 @@ var Grid = function (_React$Component) {
     this.calculator.invalidate();
   };
 
-  Grid.prototype.update = function update(scrollTop, scrollLeft) {
+  Grid.prototype.update = function update(scrollTop, scrollLeft, force) {
     var x = scrollLeft - this.props.preloadPixelsX;
     var y = scrollTop - this.props.preloadPixelsY;
 
@@ -777,7 +777,7 @@ var Grid = function (_React$Component) {
 
     var cells = this.calculator.cellsWithinBounds(bounds, this.props.rowCount, this.props.columnCount);
 
-    if (cells.changed) {
+    if (cells.changed || force) {
       var fromRow = cells.rows.length ? cells.rows[0][0] : null;
       var toRow = cells.rows.length ? cells.rows[cells.rows.length - 1][0] : null;
       var fromColumn = cells.columns.length ? cells.columns[0][0] : null;
