@@ -61,13 +61,16 @@ export default class Grid extends React.Component {
 
     this._sizeDetector = elementResizeDetector({strategy: 'scroll'});
 
+    this.scrollX = 0;
+    this.scrollY = 0;
+
     this.state = {};
   }
 
   componentDidMount() {
     this._sizeDetector.listenTo(this._root, this.handleResize);
-    this._scrollInner.addEventListener('scroll', this.handleScroll);
-    this._root.addEventListener('wheel', this.handleWheel);
+    this._scrollInner.addEventListener('scroll', this.handleScroll, {passive: true});
+    this._root.addEventListener('wheel', this.handleWheel, {passive: true});
 
     this.update(0, 0);
   }
@@ -745,7 +748,14 @@ export default class Grid extends React.Component {
   handleScroll = (event) => {
     const {scrollTop, scrollLeft} = event.target;
 
-    this.update(scrollTop, scrollLeft);
+    this.scrollY = scrollTop;
+    this.scrollX = scrollLeft;
+
+    window.cancelAnimationFrame(this._animationFrame);
+
+    this._animationFrame = window.requestAnimationFrame(() => {
+      this.update(this.scrollY, this.scrollX);
+    });
   }
 
   handleWheel = (event) => {
@@ -755,6 +765,37 @@ export default class Grid extends React.Component {
     }
 
     this.disableScrollableAreaPointerEventsSoon();
+
+    const {deltaX, deltaY} = event;
+
+    this.scrollY += deltaY;
+    this.scrollX += deltaX;
+
+    window.cancelAnimationFrame(this._animationFrame);
+
+    this._animationFrame = window.requestAnimationFrame(() => {
+      this.update(this.scrollY, this.scrollX);
+    });
+  }
+
+  queueUpdate(y, x) {
+    const MS_PER_FRAME = 1000 / 60.0;
+
+    /* eslint-disable no-undef */
+    const now = performance.now();
+
+    if (!this._lastUpdate || ((now - this._lastUpdate) > MS_PER_FRAME)) {
+      window.requestAnimationFrame(() => {
+        this._lastUpdate = performance.now();
+
+        this.update(y, x);
+      });
+    } else {
+      setTimeout(() => {
+        this.queueUpdate(y, x);
+      }, MS_PER_FRAME);
+    }
+    /* eslint-enable no-undef */
   }
 
   handleColumnResizeStart = (column, width) => {
