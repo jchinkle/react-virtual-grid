@@ -349,7 +349,7 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth,
       height: this.props.estimatedRowHeight * this.props.rowCount,
-      top: -this.fixedHeadersHeight,
+      top: 0,
       bottom: -this.fixedFootersHeight
     };
 
@@ -413,7 +413,7 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight,
-      left: -this.fixedLeftColumnsWidth
+      left: 0
     };
 
     const fromColumn = this.state.cells.topColumns.length ? this.state.cells.topColumns[0][0] : null;
@@ -451,7 +451,7 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight,
-      left: -this.fixedLeftColumnsWidth
+      left: 0
     };
 
     const fromColumn = this.state.cells.bottomColumns.length ? this.state.cells.bottomColumns[0][0] : null;
@@ -491,8 +491,10 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight * this.props.rowCount,
-      left: -this.fixedLeftColumnsWidth,
-      top: -this.fixedHeadersHeight
+      // left: -this.fixedLeftColumnsWidth,
+      // top: -this.fixedHeadersHeight
+      left: 0,
+      top: 0
     };
 
     const fromRow = this.state.cells.rows.length ? this.state.cells.rows[0][0] : null;
@@ -879,27 +881,40 @@ export default class Grid extends React.Component {
     if (this.state.cells) {
       this.setScroll(scrollLeft, scrollTop);
     }
+
+    this.scrollX = this._scrollInner.scrollLeft = Math.min(Math.max(0, scrollLeft), this._scrollInner.scrollWidth - this._scrollInner.clientWidth);
+    this.scrollY = this._scrollInner.scrollTop = Math.min(Math.max(0, scrollTop), this._scrollInner.scrollHeight - this._scrollInner.clientHeight);
   }
 
   setScroll(x, y) {
+    const transform = (xValue, yValue) => {
+      return 'translate3d(' + xValue + 'px, ' + yValue + 'px, 0px)';
+    };
+
     if (this._leftPaneBody) {
-      this._leftPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+      // this._leftPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+      this._leftPaneBody.childNodes[0].style.transform = transform(0, -y - this.fixedHeadersHeight);
     }
 
     if (this._rightPaneBody) {
-      this._rightPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+      // this._rightPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+      this._rightPaneBody.childNodes[0].style.transform = transform(0, -y - this.fixedHeadersHeight);
     }
 
     if (this._centerPaneHeader) {
-      this._centerPaneHeader.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
+      // this._centerPaneHeader.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
+      this._centerPaneHeader.childNodes[0].style.transform = transform(-x - this.fixedLeftColumnsWidth, 0);
     }
 
     if (this._centerPaneFooter) {
-      this._centerPaneFooter.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
+      // this._centerPaneFooter.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
+      this._centerPaneFooter.childNodes[0].style.transform = transform(-x - this.fixedLeftColumnsWidth, 0);
     }
 
-    this._centerPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
-    this._centerPaneBody.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
+    // this._centerPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+    // this._centerPaneBody.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
+    this._centerPaneBody.childNodes[0].style.transform = transform(-x - this.fixedLeftColumnsWidth,
+                                                                   -y - this.fixedHeadersHeight);
   }
 
   get calculator() {
