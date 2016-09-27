@@ -846,13 +846,13 @@ export default class Grid extends React.Component {
     this.calculator.invalidate();
   }
 
-  refresh = () => {
+  refresh = (force) => {
     const {scrollTop, scrollLeft} = this._scrollInner;
 
-    this.update(scrollTop, scrollLeft);
+    this.update(scrollTop, scrollLeft, force);
   }
 
-  update(scrollTop, scrollLeft) {
+  update(scrollTop, scrollLeft, force) {
     const x = scrollLeft - this.props.preloadPixelsX;
     const y = scrollTop - this.props.preloadPixelsY;
 
@@ -865,7 +865,7 @@ export default class Grid extends React.Component {
 
     const cells = this.calculator.cellsWithinBounds(bounds, this.props.rowCount, this.props.columnCount);
 
-    if (cells.changed) {
+    if (cells.changed || force) {
       const fromRow = cells.rows.length ? cells.rows[0][0] : null;
       const toRow = cells.rows.length ? cells.rows[cells.rows.length - 1][0] : null;
       const fromColumn = cells.columns.length ? cells.columns[0][0] : null;
