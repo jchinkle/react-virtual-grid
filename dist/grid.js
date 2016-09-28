@@ -43,7 +43,12 @@ var Grid = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, _React$Component.call(this, props));
 
     _this.handleRootMouseMove = function (event) {
-      var isOverScrollbar = _this.isOverScrollbar(event.nativeEvent.offsetX, event.nativeEvent.offsetY);
+      var position = _this.elementPosition(event.currentTarget);
+
+      var x = event.clientX - position.left;
+      var y = event.clientY - position.top;
+
+      var isOverScrollbar = _this.isOverScrollbar(x, y);
 
       // when the mouse moves between the 2 regions, swap the pointer events
       if (_this._isOverScrollbar !== isOverScrollbar) {
@@ -727,6 +732,19 @@ var Grid = function (_React$Component) {
     });
 
     return _react2.default.createElement('div', { style: guideStyle });
+  };
+
+  Grid.prototype.elementPosition = function elementPosition(el) {
+    var x = 0;
+    var y = 0;
+
+    while (el) {
+      x += el.offsetLeft - el.scrollLeft + el.clientLeft;
+      y += el.offsetTop - el.scrollTop + el.clientTop;
+      el = el.offsetParent;
+    }
+
+    return { left: x, top: y };
   };
 
   Grid.prototype.isOverScrollbar = function isOverScrollbar(x, y) {
