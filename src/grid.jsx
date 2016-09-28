@@ -33,11 +33,7 @@ export default class Grid extends React.Component {
 
     renderCell: React.PropTypes.func,
 
-    onExtentsChange: React.PropTypes.func,
-
-    resizableColumns: React.PropTypes.bool,
-
-    resizableRows: React.PropTypes.bool
+    onExtentsChange: React.PropTypes.func
   };
 
   static defaultProps = {
@@ -48,9 +44,7 @@ export default class Grid extends React.Component {
     fixedHeaderCount: 0,
     fixedFooterCount: 0,
     estimatedColumnWidth: 130,
-    estimatedRowHeight: 30,
-    resizableColumns: true,
-    resizableRows: true
+    estimatedRowHeight: 30
   };
 
   constructor(props) {
@@ -103,8 +97,7 @@ export default class Grid extends React.Component {
           <div style={styles.scrollContainer}
                ref={this.bindScrollInner}>
             <div className={cx('scroll-container', styles.scrollContent)}
-                 style={contentStyle}>
-            </div>
+                 style={contentStyle} />
           </div>
         </div>
       </div>
@@ -527,7 +520,7 @@ export default class Grid extends React.Component {
     };
 
     return (
-      <div style={guideStyle}></div>
+      <div style={guideStyle} />
     );
   }
 
@@ -548,7 +541,7 @@ export default class Grid extends React.Component {
     };
 
     return (
-      <div style={guideStyle}></div>
+      <div style={guideStyle} />
     );
   }
 
