@@ -1,1 +1,61 @@
-._69,._79{position:absolute;overflow:hidden;box-sizing:border-box}._69{background-color:#000;left:0;top:0;right:0;bottom:0;border:1px solid transparent}._79{border-bottom:1px solid #1D9DF9;border-left:1px solid #1D9DF9;border-right:1px solid transparent;border-top:1px solid transparent;padding:23px 3px 3px;text-align:center;font-family:sans-serif;font-size:10px;color:#1D9DF9}._89,._c9{border-bottom:1px solid #F8A104;border-right:1px solid #F8A104}._a9{color:#F8A104}._b9{border-left:1px solid transparent}._89,._99,._c9,._d9{border-left:1px solid #F8A104}._d9,._e9{border-bottom:1px solid #F8A104}._99,._f9{border-top:1px solid #F8A104;border-bottom:1px solid transparent}._g9{border-top:1px solid #F8A104}
+.test_example_jsx-styles-container {
+  background-color: black;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.test_example_jsx-styles-cell {
+  position: absolute;
+  overflow: hidden;
+  border-bottom: 1px solid #1D9DF9;
+  border-left: 1px solid #1D9DF9;
+  border-right: 1px solid transparent;
+  border-top: 1px solid transparent;
+  padding: 3px;
+  text-align: center;
+  font-family: sans-serif;
+  padding-top: 23px;
+  font-size: 10px;
+  box-sizing: border-box;
+  color: #1D9DF9;
+}
+.test_example_jsx-styles-fixed {
+  color: #F8A104;
+}
+.test_example_jsx-styles-bodyLeft {
+  border-left: 1px solid transparent;
+}
+.test_example_jsx-styles-cellTopFirst {
+  border-bottom: 1px solid #F8A104;
+}
+.test_example_jsx-styles-cellTop {
+  border-bottom: 1px solid #F8A104;
+  border-left: 1px solid #F8A104;
+}
+.test_example_jsx-styles-cellLeft {
+  border-right: 1px solid #F8A104;
+  border-bottom: 1px solid #F8A104;
+  border-left: 1px solid #F8A104;
+}
+.test_example_jsx-styles-cellRight {
+  border-left: 1px solid #F8A104;
+  border-bottom: 1px solid #F8A104;
+  border-right: 1px solid #F8A104;
+}
+.test_example_jsx-styles-cellBottomFixed {
+  border-top: 1px solid #F8A104;
+}
+.test_example_jsx-styles-cellBottomFirst {
+  border-top: 1px solid #F8A104;
+  border-bottom: 1px solid transparent;
+}
+.test_example_jsx-styles-cellBottom {
+  border-top: 1px solid #F8A104;
+  border-left: 1px solid #F8A104;
+  border-bottom: 1px solid transparent;
+}
