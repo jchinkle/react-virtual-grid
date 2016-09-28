@@ -968,11 +968,7 @@ Grid.propTypes = {
 
   renderCell: _react2.default.PropTypes.func,
 
-  onExtentsChange: _react2.default.PropTypes.func,
-
-  resizableColumns: _react2.default.PropTypes.bool,
-
-  resizableRows: _react2.default.PropTypes.bool
+  onExtentsChange: _react2.default.PropTypes.func
 };
 Grid.defaultProps = {
   preloadPixelsX: 0,
@@ -982,9 +978,7 @@ Grid.defaultProps = {
   fixedHeaderCount: 0,
   fixedFooterCount: 0,
   estimatedColumnWidth: 130,
-  estimatedRowHeight: 30,
-  resizableColumns: true,
-  resizableRows: true
+  estimatedRowHeight: 30
 };
 exports.default = Grid;
 
