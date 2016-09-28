@@ -629,7 +629,8 @@ export default class Grid extends React.Component {
   isOverScrollbar(x, y) {
     const scrollbarSize = this.scrollbarSize;
 
-    return (x >= this._root.offsetWidth - scrollbarSize) || (y >= this._root.offsetHeight - scrollbarSize);
+    return ((x >= this._root.offsetWidth - scrollbarSize) && (x <= this._root.offsetWidth)) ||
+           ((y >= this._root.offsetHeight - scrollbarSize) && (y <= this._root.offsetHeight));
   }
 
   handleRootMouseMove = (event) => {
