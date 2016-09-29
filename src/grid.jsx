@@ -340,7 +340,7 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth,
       height: this.props.estimatedRowHeight * this.props.rowCount,
-      top: 0,
+      top: -this.fixedHeadersHeight,
       bottom: -this.fixedFootersHeight,
       ...styles.translatedPane
     };
@@ -405,7 +405,7 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight,
-      left: 0,
+      left: -this.fixedLeftColumnsWidth,
       ...styles.translatedPane
     };
 
@@ -444,7 +444,7 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight,
-      left: 0,
+      left: -this.fixedLeftColumnsWidth,
       ...styles.translatedPane
     };
 
@@ -485,10 +485,8 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight * this.props.rowCount,
-      // left: -this.fixedLeftColumnsWidth,
-      // top: -this.fixedHeadersHeight
-      left: 0,
-      top: 0,
+      left: -this.fixedLeftColumnsWidth,
+      top: -this.fixedHeadersHeight,
       ...styles.translatedPane
     };
 
@@ -884,34 +882,24 @@ export default class Grid extends React.Component {
   }
 
   setScroll(x, y) {
-    const transform = (xValue, yValue) => {
-      return 'translate3d(' + xValue + 'px, ' + yValue + 'px, 0px)';
-    };
-
     if (this._leftPaneBody) {
-      // this._leftPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
-      this._leftPaneBody.childNodes[0].style.transform = transform(0, -y - this.fixedHeadersHeight);
+      this._leftPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
     }
 
     if (this._rightPaneBody) {
-      // this._rightPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
-      this._rightPaneBody.childNodes[0].style.transform = transform(0, -y - this.fixedHeadersHeight);
+      this._rightPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
     }
 
     if (this._centerPaneHeader) {
-      // this._centerPaneHeader.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
-      this._centerPaneHeader.childNodes[0].style.transform = transform(-x - this.fixedLeftColumnsWidth, 0);
+      this._centerPaneHeader.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
     }
 
     if (this._centerPaneFooter) {
-      // this._centerPaneFooter.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
-      this._centerPaneFooter.childNodes[0].style.transform = transform(-x - this.fixedLeftColumnsWidth, 0);
+      this._centerPaneFooter.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
     }
 
-    // this._centerPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
-    // this._centerPaneBody.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
-    this._centerPaneBody.childNodes[0].style.transform = transform(-x - this.fixedLeftColumnsWidth,
-                                                                   -y - this.fixedHeadersHeight);
+    this._centerPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+    this._centerPaneBody.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
   }
 
   get calculator() {
