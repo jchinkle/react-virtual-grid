@@ -55,16 +55,13 @@ export default class Grid extends React.Component {
 
     this._sizeDetector = elementResizeDetector({strategy: 'scroll'});
 
-    this.scrollX = 0;
-    this.scrollY = 0;
-
     this.state = {};
   }
 
   componentDidMount() {
     this._sizeDetector.listenTo(this._root, this.handleResize);
-    this._scrollInner.addEventListener('scroll', this.handleScroll, {passive: true});
-    this._root.addEventListener('wheel', this.handleWheel, {passive: true});
+    this._scrollInner.addEventListener('scroll', this.handleScroll);
+    this._root.addEventListener('wheel', this.handleWheel);
 
     this.update(0, 0);
   }
@@ -210,7 +207,8 @@ export default class Grid extends React.Component {
     const contentStyle = {
       position: 'absolute',
       width: this.props.estimatedColumnWidth,
-      height: this.props.estimatedRowHeight * this.props.rowCount
+      height: this.props.estimatedRowHeight * this.props.rowCount,
+      ...styles.translatedPane
     };
 
     const fromRow = this.state.cells.leftRows.length ? this.state.cells.leftRows[0][0] : null;
@@ -343,7 +341,8 @@ export default class Grid extends React.Component {
       width: this.props.estimatedColumnWidth,
       height: this.props.estimatedRowHeight * this.props.rowCount,
       top: 0,
-      bottom: -this.fixedFootersHeight
+      bottom: -this.fixedFootersHeight,
+      ...styles.translatedPane
     };
 
     const fromColumn = this.props.columnCount > 0 ? this.props.columnCount - this.props.fixedRightColumnCount : 0;
@@ -406,7 +405,8 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight,
-      left: 0
+      left: 0,
+      ...styles.translatedPane
     };
 
     const fromColumn = this.state.cells.topColumns.length ? this.state.cells.topColumns[0][0] : null;
@@ -444,7 +444,8 @@ export default class Grid extends React.Component {
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight,
-      left: 0
+      left: 0,
+      ...styles.translatedPane
     };
 
     const fromColumn = this.state.cells.bottomColumns.length ? this.state.cells.bottomColumns[0][0] : null;
@@ -487,7 +488,8 @@ export default class Grid extends React.Component {
       // left: -this.fixedLeftColumnsWidth,
       // top: -this.fixedHeadersHeight
       left: 0,
-      top: 0
+      top: 0,
+      ...styles.translatedPane
     };
 
     const fromRow = this.state.cells.rows.length ? this.state.cells.rows[0][0] : null;
@@ -762,13 +764,10 @@ export default class Grid extends React.Component {
   handleScroll = (event) => {
     const {scrollTop, scrollLeft} = event.target;
 
-    this.scrollY = scrollTop;
-    this.scrollX = scrollLeft;
-
     window.cancelAnimationFrame(this._animationFrame);
 
     this._animationFrame = window.requestAnimationFrame(() => {
-      this.update(this.scrollY, this.scrollX);
+      this.update(scrollTop, scrollLeft);
     });
   }
 
@@ -779,17 +778,6 @@ export default class Grid extends React.Component {
     }
 
     this.disableScrollableAreaPointerEventsSoon();
-
-    const {deltaX, deltaY} = event;
-
-    this.scrollY += deltaY;
-    this.scrollX += deltaX;
-
-    window.cancelAnimationFrame(this._animationFrame);
-
-    this._animationFrame = window.requestAnimationFrame(() => {
-      this.update(this.scrollY, this.scrollX);
-    });
   }
 
   queueUpdate(y, x) {
@@ -893,9 +881,6 @@ export default class Grid extends React.Component {
     if (this.state.cells) {
       this.setScroll(scrollLeft, scrollTop);
     }
-
-    this.scrollX = this._scrollInner.scrollLeft = Math.min(Math.max(0, scrollLeft), this._scrollInner.scrollWidth - this._scrollInner.clientWidth);
-    this.scrollY = this._scrollInner.scrollTop = Math.min(Math.max(0, scrollTop), this._scrollInner.scrollHeight - this._scrollInner.clientHeight);
   }
 
   setScroll(x, y) {
@@ -1020,6 +1005,9 @@ const styles = {
   pane: {
     position: 'absolute',
     overflow: 'hidden'
+  },
+
+  translatedPane: {
   },
 
   columnResizeGuide: {
