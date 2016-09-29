@@ -33,11 +33,7 @@ export default class Grid extends React.Component {
 
     renderCell: React.PropTypes.func,
 
-    onExtentsChange: React.PropTypes.func,
-
-    resizableColumns: React.PropTypes.bool,
-
-    resizableRows: React.PropTypes.bool
+    onExtentsChange: React.PropTypes.func
   };
 
   static defaultProps = {
@@ -48,9 +44,7 @@ export default class Grid extends React.Component {
     fixedHeaderCount: 0,
     fixedFooterCount: 0,
     estimatedColumnWidth: 130,
-    estimatedRowHeight: 30,
-    resizableColumns: true,
-    resizableRows: true
+    estimatedRowHeight: 30
   };
 
   constructor(props) {
@@ -106,8 +100,7 @@ export default class Grid extends React.Component {
           <div style={styles.scrollContainer}
                ref={this.bindScrollInner}>
             <div className={cx('scroll-container', styles.scrollContent)}
-                 style={contentStyle}>
-            </div>
+                 style={contentStyle} />
           </div>
         </div>
       </div>
@@ -532,7 +525,7 @@ export default class Grid extends React.Component {
     };
 
     return (
-      <div style={guideStyle}></div>
+      <div style={guideStyle} />
     );
   }
 
@@ -553,7 +546,7 @@ export default class Grid extends React.Component {
     };
 
     return (
-      <div style={guideStyle}></div>
+      <div style={guideStyle} />
     );
   }
 
@@ -631,14 +624,33 @@ export default class Grid extends React.Component {
     return this._scrollbarSize;
   }
 
+  elementPosition(el) {
+    let x = 0;
+    let y = 0;
+
+    while (el) {
+      x += (el.offsetLeft - el.scrollLeft + el.clientLeft);
+      y += (el.offsetTop - el.scrollTop + el.clientTop);
+      el = el.offsetParent;
+    }
+
+    return { left: x, top: y };
+  }
+
   isOverScrollbar(x, y) {
     const scrollbarSize = this.scrollbarSize;
 
-    return (x >= this._root.offsetWidth - scrollbarSize) || (y >= this._root.offsetHeight - scrollbarSize);
+    return (x >= this._root.offsetWidth - scrollbarSize) ||
+           (y >= this._root.offsetHeight - scrollbarSize);
   }
 
   handleRootMouseMove = (event) => {
-    const isOverScrollbar = this.isOverScrollbar(event.clientX, event.clientY);
+    const position = this.elementPosition(event.currentTarget);
+
+    const x = event.clientX - position.left;
+    const y = event.clientY - position.top;
+
+    const isOverScrollbar = this.isOverScrollbar(x, y);
 
     // when the mouse moves between the 2 regions, swap the pointer events
     if (this._isOverScrollbar !== isOverScrollbar) {

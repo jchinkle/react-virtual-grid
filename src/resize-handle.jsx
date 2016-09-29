@@ -1,3 +1,5 @@
+/* eslint-disable react/style-prop-object */
+
 import React from 'react';
 
 export default class ResizeHandle extends React.Component {
@@ -56,7 +58,7 @@ export default class ResizeHandle extends React.Component {
            onMouseLeave={this.handleMouseLeave}
            onMouseDownCapture={this.handleMouseDown}
            onTouchStartCapture={this.handleTouchStart}>
-        <div style={lineStyles}></div>
+        <div style={lineStyles} />
       </div>
     );
   }

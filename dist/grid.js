@@ -43,7 +43,12 @@ var Grid = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, _React$Component.call(this, props));
 
     _this.handleRootMouseMove = function (event) {
-      var isOverScrollbar = _this.isOverScrollbar(event.clientX, event.clientY);
+      var position = _this.elementPosition(event.currentTarget);
+
+      var x = event.clientX - position.left;
+      var y = event.clientY - position.top;
+
+      var isOverScrollbar = _this.isOverScrollbar(x, y);
 
       // when the mouse moves between the 2 regions, swap the pointer events
       if (_this._isOverScrollbar !== isOverScrollbar) {
@@ -188,13 +193,13 @@ var Grid = function (_React$Component) {
       _this.refresh();
     };
 
-    _this.refresh = function () {
+    _this.refresh = function (force) {
       var _this$_scrollInner2 = _this._scrollInner;
       var scrollTop = _this$_scrollInner2.scrollTop;
       var scrollLeft = _this$_scrollInner2.scrollLeft;
 
 
-      _this.update(scrollTop, scrollLeft);
+      _this.update(scrollTop, scrollLeft, force);
     };
 
     _this.calculateRowHeight = function (row) {
@@ -729,6 +734,19 @@ var Grid = function (_React$Component) {
     return _react2.default.createElement('div', { style: guideStyle });
   };
 
+  Grid.prototype.elementPosition = function elementPosition(el) {
+    var x = 0;
+    var y = 0;
+
+    while (el) {
+      x += el.offsetLeft - el.scrollLeft + el.clientLeft;
+      y += el.offsetTop - el.scrollTop + el.clientTop;
+      el = el.offsetParent;
+    }
+
+    return { left: x, top: y };
+  };
+
   Grid.prototype.isOverScrollbar = function isOverScrollbar(x, y) {
     var scrollbarSize = this.scrollbarSize;
 
@@ -764,7 +782,7 @@ var Grid = function (_React$Component) {
     this.calculator.invalidate();
   };
 
-  Grid.prototype.update = function update(scrollTop, scrollLeft) {
+  Grid.prototype.update = function update(scrollTop, scrollLeft, force) {
     var x = scrollLeft - this.props.preloadPixelsX;
     var y = scrollTop - this.props.preloadPixelsY;
 
@@ -777,7 +795,7 @@ var Grid = function (_React$Component) {
 
     var cells = this.calculator.cellsWithinBounds(bounds, this.props.rowCount, this.props.columnCount);
 
-    if (cells.changed) {
+    if (cells.changed || force) {
       var fromRow = cells.rows.length ? cells.rows[0][0] : null;
       var toRow = cells.rows.length ? cells.rows[cells.rows.length - 1][0] : null;
       var fromColumn = cells.columns.length ? cells.columns[0][0] : null;
@@ -968,11 +986,7 @@ Grid.propTypes = {
 
   renderCell: _react2.default.PropTypes.func,
 
-  onExtentsChange: _react2.default.PropTypes.func,
-
-  resizableColumns: _react2.default.PropTypes.bool,
-
-  resizableRows: _react2.default.PropTypes.bool
+  onExtentsChange: _react2.default.PropTypes.func
 };
 Grid.defaultProps = {
   preloadPixelsX: 0,
@@ -982,9 +996,7 @@ Grid.defaultProps = {
   fixedHeaderCount: 0,
   fixedFooterCount: 0,
   estimatedColumnWidth: 130,
-  estimatedRowHeight: 30,
-  resizableColumns: true,
-  resizableRows: true
+  estimatedRowHeight: 30
 };
 exports.default = Grid;
 
