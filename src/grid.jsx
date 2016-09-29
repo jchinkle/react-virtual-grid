@@ -778,26 +778,6 @@ export default class Grid extends React.Component {
     this.disableScrollableAreaPointerEventsSoon();
   }
 
-  queueUpdate(y, x) {
-    const MS_PER_FRAME = 1000 / 60.0;
-
-    /* eslint-disable no-undef */
-    const now = performance.now();
-
-    if (!this._lastUpdate || ((now - this._lastUpdate) > MS_PER_FRAME)) {
-      window.requestAnimationFrame(() => {
-        this._lastUpdate = performance.now();
-
-        this.update(y, x);
-      });
-    } else {
-      setTimeout(() => {
-        this.queueUpdate(y, x);
-      }, MS_PER_FRAME);
-    }
-    /* eslint-enable no-undef */
-  }
-
   handleColumnResizeStart = (column, width) => {
     this._resizingColumn = column;
 
