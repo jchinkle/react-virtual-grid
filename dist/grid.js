@@ -139,7 +139,11 @@ var Grid = function (_React$Component) {
       var scrollLeft = _event$target.scrollLeft;
 
 
-      _this.update(scrollTop, scrollLeft);
+      window.cancelAnimationFrame(_this._animationFrame);
+
+      _this._animationFrame = window.requestAnimationFrame(function () {
+        _this.update(scrollTop, scrollLeft);
+      });
     };
 
     _this.handleWheel = function (event) {
@@ -381,11 +385,11 @@ var Grid = function (_React$Component) {
       bottom: this.fixedFootersHeight
     });
 
-    var contentStyle = {
+    var contentStyle = _extends({
       position: 'absolute',
       width: this.props.estimatedColumnWidth,
       height: this.props.estimatedRowHeight * this.props.rowCount
-    };
+    }, styles.translatedPane);
 
     var fromRow = this.state.cells.leftRows.length ? this.state.cells.leftRows[0][0] : null;
     var toRow = this.state.cells.leftRows.length ? this.state.cells.leftRows[this.state.cells.leftRows.length - 1][0] : null;
@@ -516,13 +520,13 @@ var Grid = function (_React$Component) {
       bottom: this.fixedFootersHeight
     });
 
-    var contentStyle = {
+    var contentStyle = _extends({
       position: 'absolute',
       width: this.props.estimatedColumnWidth,
       height: this.props.estimatedRowHeight * this.props.rowCount,
       top: -this.fixedHeadersHeight,
       bottom: -this.fixedFootersHeight
-    };
+    }, styles.translatedPane);
 
     var fromColumn = this.props.columnCount > 0 ? this.props.columnCount - this.props.fixedRightColumnCount : 0;
     var toColumn = fromColumn ? fromColumn + this.props.fixedRightColumnCount - 1 : null;
@@ -582,12 +586,12 @@ var Grid = function (_React$Component) {
       overflow: 'visible' // TODO(zhm) this is needed for the column menus, what does it possibly break?
     });
 
-    var contentStyle = {
+    var contentStyle = _extends({
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight,
       left: -this.fixedLeftColumnsWidth
-    };
+    }, styles.translatedPane);
 
     var fromColumn = this.state.cells.topColumns.length ? this.state.cells.topColumns[0][0] : null;
     var toColumn = this.state.cells.topColumns.length ? this.state.cells.topColumns[this.state.cells.topColumns.length - 1][0] : null;
@@ -622,12 +626,12 @@ var Grid = function (_React$Component) {
       overflow: 'visible' // TODO(zhm) this is needed for the column menus, what does it possibly break?
     });
 
-    var contentStyle = {
+    var contentStyle = _extends({
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight,
       left: -this.fixedLeftColumnsWidth
-    };
+    }, styles.translatedPane);
 
     var fromColumn = this.state.cells.bottomColumns.length ? this.state.cells.bottomColumns[0][0] : null;
     var toColumn = this.state.cells.bottomColumns.length ? this.state.cells.bottomColumns[this.state.cells.bottomColumns.length - 1][0] : null;
@@ -664,13 +668,13 @@ var Grid = function (_React$Component) {
       bottom: this.fixedFootersHeight
     });
 
-    var contentStyle = {
+    var contentStyle = _extends({
       position: 'absolute',
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight * this.props.rowCount,
       left: -this.fixedLeftColumnsWidth,
       top: -this.fixedHeadersHeight
-    };
+    }, styles.translatedPane);
 
     var fromRow = this.state.cells.rows.length ? this.state.cells.rows[0][0] : null;
     var toRow = this.state.cells.rows.length ? this.state.cells.rows[this.state.cells.rows.length - 1][0] : null;
@@ -1043,6 +1047,8 @@ var styles = {
     position: 'absolute',
     overflow: 'hidden'
   },
+
+  translatedPane: {},
 
   columnResizeGuide: {
     position: 'absolute',
