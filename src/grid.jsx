@@ -2,8 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import GridCalculator from './grid-calculator';
 import elementResizeDetector from 'element-resize-detector';
-
-const POINTER_EVENTS_SCROLL_DELAY = 200;
+import IScroll from 'iscroll/build/iscroll-probe';
 
 export default class Grid extends React.Component {
   static propTypes = {
@@ -60,16 +59,27 @@ export default class Grid extends React.Component {
 
   componentDidMount() {
     this._sizeDetector.listenTo(this._root, this.handleResize);
-    this._scrollInner.addEventListener('scroll', this.handleScroll);
-    this._root.addEventListener('wheel', this.handleWheel);
 
     this.update(0, 0);
+
+    const scrollOptions = {
+      disableMouse: true,
+      bounce: false, // disable bounce because we're already customizing positioning
+      scrollX: true,
+      freeScroll: true,
+      scrollbars: true,
+      probeType: 3,
+      mouseWheel: true,
+      preventDefault: false,
+      interactiveScrollbars: true
+    };
+
+    this._scroller = new IScroll(this._scrollInner, scrollOptions);
+    this._scroller.on('scroll', this.handleScroll);
   }
 
   componentWillUnmount() {
     this._sizeDetector.uninstall(this._root);
-    this._scrollInner.removeEventListener('scroll', this.handleScroll);
-    this._root.removeEventListener('wheel', this.handleWheel);
   }
 
   render() {
@@ -77,27 +87,29 @@ export default class Grid extends React.Component {
 
     const contentStyle = {
       ...styles.scrollContent,
+      position: 'absolute',
       width: this.scrollableWidth,
       height: this.scrollableHeight
     };
 
     return (
       <div style={styles.container}
-           ref={this.bindRoot}
-           onMouseMove={this.handleRootMouseMove}>
-        <div style={styles.gridBody}>
-          {this.renderLeftPane()}
-          {this.renderRightPane()}
-          {this.renderCenterPane()}
-          {this.renderColumnResizeGuide()}
-          {this.renderRowResizeGuide()}
-        </div>
+           ref={this.bindRoot}>
         <div style={styles.scrollOverlay}
              ref={this.bindScrollOverlay}>
-          <div style={styles.scrollContainer}
+          <div className="scroll-inner"
+               style={styles.scrollContainer}
                ref={this.bindScrollInner}>
-            <div className={cx('scroll-container', styles.scrollContent)}
-                 style={contentStyle} />
+            <div className={cx('scroll-container')}
+                 style={contentStyle}>
+              <div style={styles.gridBody}>
+                {this.renderLeftPane()}
+                {this.renderRightPane()}
+                {this.renderCenterPane()}
+                {this.renderColumnResizeGuide()}
+                {this.renderRowResizeGuide()}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -110,14 +122,12 @@ export default class Grid extends React.Component {
     const attrs = {
       ...styles.pane,
       left: 0,
-      top: 0,
-      bottom: 0,
       width: this.fixedLeftColumnsWidth
     };
 
     return (
       <div ref={this.bindLeftPane}
-           className={cx()}
+           className={cx('left-pane')}
            style={attrs}>
         {this.renderLeftPaneHeader()}
         {this.renderLeftPaneFooter()}
@@ -146,7 +156,7 @@ export default class Grid extends React.Component {
 
     return (
       <div ref={this.bindLeftPaneHeader}
-           className={cx()}
+           className={cx('left-pane-header')}
            style={attrs}>
         <div className={cx(styles.leftPaneHeaderContent)}
              style={contentStyle}>
@@ -179,7 +189,7 @@ export default class Grid extends React.Component {
 
     return (
       <div ref={this.bindLeftPaneFooter}
-           className={cx()}
+           className={cx('left-pane-footer')}
            style={attrs}>
         <div className={cx(styles.leftPaneFooterContent)}
              style={contentStyle}>
@@ -216,7 +226,7 @@ export default class Grid extends React.Component {
 
     return (
       <div ref={this.bindLeftPaneBody}
-           className={cx()}
+           className={cx('left-pane-body')}
            style={attrs}>
         <div className={cx(styles.leftPaneBodyContent)}
              style={contentStyle}>
@@ -236,14 +246,12 @@ export default class Grid extends React.Component {
     const attrs = {
       ...styles.pane,
       right: 0,
-      top: 0,
-      bottom: 0,
       width: this.fixedRightColumnsWidth
     };
 
     return (
       <div ref={this.bindRightPane}
-           className={cx()}
+           className={cx('right-pane')}
            style={attrs}>
         {this.renderRightPaneHeader()}
         {this.renderRightPaneFooter()}
@@ -275,7 +283,7 @@ export default class Grid extends React.Component {
 
     return (
       <div ref={this.bindRightPaneHeader}
-           className={cx()}
+           className={cx('right-pane-header')}
            style={attrs}>
         <div className={cx(styles.rightPaneHeaderContent)}
              style={contentStyle}>
@@ -311,7 +319,7 @@ export default class Grid extends React.Component {
 
     return (
       <div ref={this.bindRightPaneFooter}
-           className={cx()}
+           className={cx('right-pane-footer')}
            style={attrs}>
         <div className={cx(styles.rightPaneFooterContent)}
              style={contentStyle}>
@@ -353,7 +361,7 @@ export default class Grid extends React.Component {
 
     return (
       <div ref={this.bindRightPaneBody}
-           className={cx()}
+           className={cx('right-pane-body')}
            style={attrs}>
         <div className={cx(styles.rightPaneBodyContent)}
              style={contentStyle}>
@@ -369,14 +377,12 @@ export default class Grid extends React.Component {
     const attrs = {
       ...styles.pane,
       left: this.fixedLeftColumnsWidth,
-      top: 0,
-      bottom: 0,
       right: this.fixedRightColumnsWidth
     };
 
     return (
       <div ref={this.bindCenterPane}
-           className={cx()}
+           className={cx('center-pane')}
            style={attrs}>
         {this.renderCenterPaneHeader()}
         {this.renderCenterPaneFooter()}
@@ -414,7 +420,7 @@ export default class Grid extends React.Component {
 
     return (
       <div ref={this.bindCenterPaneHeader}
-           className={cx()}
+           className={cx('center-pane-header')}
            style={attrs}>
         <div className={cx(styles.centerPaneHeaderContent)}
              style={contentStyle}>
@@ -456,7 +462,7 @@ export default class Grid extends React.Component {
 
     return (
       <div ref={this.bindCenterPaneFooter}
-           className={cx()}
+           className={cx('center-pane-footer')}
            style={attrs}>
         <div className={cx(styles.centerPaneHeaderContent)}
              style={contentStyle}>
@@ -498,7 +504,7 @@ export default class Grid extends React.Component {
 
     return (
       <div ref={this.bindCenterPaneBody}
-           className={cx()}
+           className={cx('center-pane-body')}
            style={attrs}>
         <div className={cx(styles.centerPaneBodyContent)}
              style={contentStyle}>
@@ -521,7 +527,7 @@ export default class Grid extends React.Component {
 
     const guideStyle = {
       ...styles.columnResizeGuide,
-      left: -this._scrollInner.scrollLeft + column[1] + column[2] - 2
+      left: column[1] + column[2] - 2
     };
 
     return (
@@ -542,7 +548,7 @@ export default class Grid extends React.Component {
 
     const guideStyle = {
       ...styles.rowResizeGuide,
-      top: -this._scrollInner.scrollTop + row[1] + row[2] - 2
+      top: row[1] + row[2] - 2
     };
 
     return (
@@ -616,83 +622,6 @@ export default class Grid extends React.Component {
     return lastOffset;
   }
 
-  get scrollbarSize() {
-    if (this._scrollbarSize == null) {
-      this._scrollbarSize = Math.max(15, this._scrollInner.offsetHeight - this._scrollInner.clientHeight);
-    }
-
-    return this._scrollbarSize;
-  }
-
-  elementPosition(el) {
-    let x = 0;
-    let y = 0;
-
-    while (el) {
-      x += (el.offsetLeft - el.scrollLeft + el.clientLeft);
-      y += (el.offsetTop - el.scrollTop + el.clientTop);
-      el = el.offsetParent;
-    }
-
-    return { left: x, top: y };
-  }
-
-  isOverScrollbar(x, y) {
-    const scrollbarSize = this.scrollbarSize;
-
-    return (x >= this._root.offsetWidth - scrollbarSize) ||
-           (y >= this._root.offsetHeight - scrollbarSize);
-  }
-
-  handleRootMouseMove = (event) => {
-    const position = this.elementPosition(event.currentTarget);
-
-    const x = event.clientX - position.left;
-    const y = event.clientY - position.top;
-
-    const isOverScrollbar = this.isOverScrollbar(x, y);
-
-    // when the mouse moves between the 2 regions, swap the pointer events
-    if (this._isOverScrollbar !== isOverScrollbar) {
-      if (isOverScrollbar) {
-        // when over the scrollbar area, enable the pointer events on the scroll area
-        this.enableScrollableAreaPointerEvents();
-      } else {
-        // when over the grid area, disable the pointer events on the scroll area so the cells are interactive
-        this.disableScrollableAreaPointerEventsSoon();
-      }
-    }
-
-    this._isOverScrollbar = isOverScrollbar;
-  }
-
-  enableScrollableAreaPointerEvents() {
-    clearTimeout(this._disableScrollableAreaPointerEventsDelay);
-    this._disableScrollableAreaPointerEventsDelay = null;
-
-    this._scrollOverlay.style.pointerEvents = 'auto';
-  }
-
-  disableScrollableAreaPointerEventsSoon() {
-    clearTimeout(this._disableScrollableAreaPointerEventsDelay);
-
-    this._disableScrollableAreaPointerEventsDelay = setTimeout(() => {
-      this._disableScrollableAreaPointerEventsDelay = null;
-
-      if (!this._isOverScrollbar) {
-        this.disableScrollableAreaPointerEventsNow();
-      }
-    }, POINTER_EVENTS_SCROLL_DELAY);
-  }
-
-  get isScrolling() {
-    return this._disableScrollableAreaPointerEventsDelay != null;
-  }
-
-  disableScrollableAreaPointerEventsNow() {
-    this._scrollOverlay.style.pointerEvents = 'none';
-  }
-
   bindRoot = (node) => {
     this._root = node;
   }
@@ -754,28 +683,11 @@ export default class Grid extends React.Component {
   }
 
   handleResize = (event) => {
-    const {scrollTop, scrollLeft} = this._scrollInner;
-
-    this.update(scrollTop, scrollLeft);
+    this.update(this.scrollTop, this.scrollLeft);
   }
 
   handleScroll = (event) => {
-    const {scrollTop, scrollLeft} = event.target;
-
-    window.cancelAnimationFrame(this._animationFrame);
-
-    this._animationFrame = window.requestAnimationFrame(() => {
-      this.update(scrollTop, scrollLeft);
-    });
-  }
-
-  handleWheel = (event) => {
-    if (!this.isScrolling) {
-      this.enableScrollableAreaPointerEvents();
-      event.preventDefault();
-    }
-
-    this.disableScrollableAreaPointerEventsSoon();
+    this.update(this.scrollTop, this.scrollLeft);
   }
 
   handleColumnResizeStart = (column, width) => {
@@ -825,9 +737,7 @@ export default class Grid extends React.Component {
   }
 
   refresh = (force) => {
-    const {scrollTop, scrollLeft} = this._scrollInner;
-
-    this.update(scrollTop, scrollLeft, force);
+    this.update(this.scrollTop, this.scrollLeft, force);
   }
 
   update(scrollTop, scrollLeft, force) {
@@ -859,6 +769,17 @@ export default class Grid extends React.Component {
     if (this.state.cells) {
       this.setScroll(scrollLeft, scrollTop);
     }
+
+    const scrollableWidth = this.scrollableWidth;
+    const scrollableHeight = this.scrollableHeight;
+
+    // if the srollable width or height changes, refresh the scroller
+    if (force || this._lastScrollableWidth !== scrollableWidth || this._lastScrollableHeight !== scrollableHeight) {
+      this._lastScrollableWidth = scrollableWidth;
+      this._lastScrollableHeight = scrollableHeight;
+
+      setTimeout(() => this._scroller.refresh(), 0);
+    }
   }
 
   setScroll(x, y) {
@@ -880,6 +801,23 @@ export default class Grid extends React.Component {
 
     this._centerPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
     this._centerPaneBody.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
+
+    if (this._leftPane) {
+      this._leftPane.style.left = x + 'px';
+      this._leftPane.style.top = y + 'px';
+      this._leftPane.style.height = this._scrollOverlay.offsetHeight + 'px';
+    }
+
+    if (this._rightPane) {
+      this._rightPane.style.left = (x + this._scrollOverlay.offsetWidth - this.fixedRightColumnsWidth) + 'px';
+      this._rightPane.style.top = y + 'px';
+      this._rightPane.style.height = this._scrollOverlay.offsetHeight + 'px';
+    }
+
+    this._centerPane.style.left = (x + this.fixedLeftColumnsWidth) + 'px';
+    this._centerPane.style.top = y + 'px';
+    this._centerPane.style.height = this._scrollOverlay.offsetHeight + 'px';
+    this._centerPane.style.width = (this._scrollOverlay.offsetWidth - this.fixedRightColumnsWidth - this.fixedLeftColumnsWidth) + 'px';
   }
 
   get calculator() {
@@ -930,6 +868,14 @@ export default class Grid extends React.Component {
 
     return cells;
   }
+
+  get scrollTop() {
+    return -this._scroller.y;
+  }
+
+  get scrollLeft() {
+    return -this._scroller.x;
+  }
 }
 
 const styles = {
@@ -947,8 +893,7 @@ const styles = {
     top: 0,
     right: 0,
     bottom: 0,
-    overflow: 'hidden',
-    pointerEvents: 'none'
+    overflow: 'hidden'
   },
 
   scrollContainer: {
@@ -956,9 +901,7 @@ const styles = {
     left: 0,
     top: 0,
     right: 0,
-    bottom: 0,
-    overflow: 'scroll',
-    WebkitOverflowScrolling: 'touch'
+    bottom: 0
   },
 
   gridBody: {
