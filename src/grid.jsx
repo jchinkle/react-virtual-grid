@@ -32,7 +32,9 @@ export default class Grid extends React.Component {
 
     renderCell: React.PropTypes.func,
 
-    onExtentsChange: React.PropTypes.func
+    onExtentsChange: React.PropTypes.func,
+
+    scrollOptions: React.PropTypes.object
   };
 
   static defaultProps = {
@@ -71,7 +73,8 @@ export default class Grid extends React.Component {
       probeType: 3,
       mouseWheel: true,
       preventDefault: false,
-      interactiveScrollbars: true
+      interactiveScrollbars: true,
+      ...this.props.scrollOptions
     };
 
     this._scroller = new IScroll(this._scrollInner, scrollOptions);
