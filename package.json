@@ -68,7 +68,7 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "element-resize-detector": "^1.1.9",
-    "iscroll": "^5.2.0"
+    "iscroll": "github:zhm/iscroll#horizontal-scroll-fix"
   },
   "keywords": [
     "grid",
