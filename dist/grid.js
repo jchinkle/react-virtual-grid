@@ -188,7 +188,7 @@ var Grid = function (_React$Component) {
 
     this.update(0, 0);
 
-    var scrollOptions = {
+    var scrollOptions = _extends({
       disableMouse: true,
       bounce: false, // disable bounce because we're already customizing positioning
       scrollX: true,
@@ -198,7 +198,7 @@ var Grid = function (_React$Component) {
       mouseWheel: true,
       preventDefault: false,
       interactiveScrollbars: true
-    };
+    }, this.props.scrollOptions);
 
     this._scroller = new _iscrollProbe2.default(this._scrollInner, scrollOptions);
     this._scroller.on('scroll', this.handleScroll);
@@ -935,7 +935,9 @@ Grid.propTypes = {
 
   renderCell: _react2.default.PropTypes.func,
 
-  onExtentsChange: _react2.default.PropTypes.func
+  onExtentsChange: _react2.default.PropTypes.func,
+
+  scrollOptions: _react2.default.PropTypes.object
 };
 Grid.defaultProps = {
   preloadPixelsX: 0,
