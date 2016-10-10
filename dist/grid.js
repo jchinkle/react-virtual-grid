@@ -110,6 +110,26 @@ var Grid = function (_React$Component) {
 
     _this.handleScroll = function (event) {
       _this.update(_this.scrollTop, _this.scrollLeft);
+
+      if (_this.props.onScroll) {
+        _this.props.onScroll(_this);
+      }
+    };
+
+    _this.handleScrollStart = function (event) {
+      _this._scrolling = true;
+
+      if (_this.props.onScrollStart) {
+        _this.props.onScrollStart(_this);
+      }
+    };
+
+    _this.handleScrollEnd = function (event) {
+      _this._scrolling = false;
+
+      if (_this.props.onScrollEnd) {
+        _this.props.onScrollEnd(_this);
+      }
     };
 
     _this.handleColumnResizeStart = function (column, width) {
@@ -174,6 +194,8 @@ var Grid = function (_React$Component) {
       return _this.props.columnWidth(column);
     };
 
+    _this._scrolling = false;
+
     _this._pinnedColumnWidths = {};
     _this._pinnedRowHeights = {};
 
@@ -202,10 +224,17 @@ var Grid = function (_React$Component) {
 
     this._scroller = new _iscrollProbe2.default(this._scrollInner, scrollOptions);
     this._scroller.on('scroll', this.handleScroll);
+    this._scroller.on('scrollStart', this.handleScrollStart);
+    this._scroller.on('scrollEnd', this.handleScrollEnd);
   };
 
   Grid.prototype.componentWillUnmount = function componentWillUnmount() {
     this._sizeDetector.uninstall(this._root);
+
+    this._scroller.off('scroll', this.handleScroll);
+    this._scroller.off('scrollStart', this.handleScrollStart);
+    this._scroller.off('scrollEnd', this.handleScrollEnd);
+    this._scroller.destroy();
   };
 
   Grid.prototype.render = function render() {
@@ -805,6 +834,11 @@ var Grid = function (_React$Component) {
   };
 
   _createClass(Grid, [{
+    key: 'isScrolling',
+    get: function get() {
+      return this._scrolling;
+    }
+  }, {
     key: 'scrollableWidth',
     get: function get() {
       if (!this.state.cells || !this.state.cells.columns.length) {
@@ -936,6 +970,12 @@ Grid.propTypes = {
   renderCell: _react2.default.PropTypes.func,
 
   onExtentsChange: _react2.default.PropTypes.func,
+
+  onScrollStart: _react2.default.PropTypes.func,
+
+  onScroll: _react2.default.PropTypes.func,
+
+  onScrollEnd: _react2.default.PropTypes.func,
 
   scrollOptions: _react2.default.PropTypes.object
 };
