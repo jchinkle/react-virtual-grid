@@ -821,12 +821,12 @@ var Grid = function (_React$Component) {
 
     var render = this.props.renderCell;
 
-    for (var row = toRow; row >= fromRow; --row) {
-      for (var column = toColumn; column >= fromColumn; --column) {
+    for (var row = toRow, visibleRowIndex = 0; row >= fromRow; --row, ++visibleRowIndex) {
+      for (var column = toColumn, visibleColumnIndex = 0; column >= fromColumn; --column, ++visibleColumnIndex) {
         var rowData = rows[row - fromRow];
         var columnData = columns[column - fromColumn];
 
-        cells.push(render(row, rowData, column, columnData, this));
+        cells.push(render(row, rowData, column, columnData, this, visibleRowIndex, visibleColumnIndex));
       }
     }
 
