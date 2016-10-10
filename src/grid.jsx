@@ -34,6 +34,12 @@ export default class Grid extends React.Component {
 
     onExtentsChange: React.PropTypes.func,
 
+    onScrollStart: React.PropTypes.func,
+
+    onScroll: React.PropTypes.func,
+
+    onScrollEnd: React.PropTypes.func,
+
     scrollOptions: React.PropTypes.object
   };
 
@@ -50,6 +56,8 @@ export default class Grid extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this._scrolling = false;
 
     this._pinnedColumnWidths = {};
     this._pinnedRowHeights = {};
@@ -79,10 +87,17 @@ export default class Grid extends React.Component {
 
     this._scroller = new IScroll(this._scrollInner, scrollOptions);
     this._scroller.on('scroll', this.handleScroll);
+    this._scroller.on('scrollStart', this.handleScrollStart);
+    this._scroller.on('scrollEnd', this.handleScrollEnd);
   }
 
   componentWillUnmount() {
     this._sizeDetector.uninstall(this._root);
+
+    this._scroller.off('scroll', this.handleScroll);
+    this._scroller.off('scrollStart', this.handleScrollStart);
+    this._scroller.off('scrollEnd', this.handleScrollEnd);
+    this._scroller.destroy();
   }
 
   render() {
@@ -559,6 +574,10 @@ export default class Grid extends React.Component {
     );
   }
 
+  get isScrolling() {
+    return this._scrolling;
+  }
+
   get scrollableWidth() {
     if (!this.state.cells || !this.state.cells.columns.length) {
       return this.props.estimatedColumnWidth * this.props.columnCount;
@@ -691,6 +710,26 @@ export default class Grid extends React.Component {
 
   handleScroll = (event) => {
     this.update(this.scrollTop, this.scrollLeft);
+
+    if (this.props.onScroll) {
+      this.props.onScroll(this);
+    }
+  }
+
+  handleScrollStart = (event) => {
+    this._scrolling = true;
+
+    if (this.props.onScrollStart) {
+      this.props.onScrollStart(this);
+    }
+  }
+
+  handleScrollEnd = (event) => {
+    this._scrolling = false;
+
+    if (this.props.onScrollEnd) {
+      this.props.onScrollEnd(this);
+    }
   }
 
   handleColumnResizeStart = (column, width) => {
