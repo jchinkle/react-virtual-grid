@@ -899,12 +899,12 @@ export default class Grid extends React.Component {
 
     const render = this.props.renderCell;
 
-    for (let row = toRow; row >= fromRow; --row) {
-      for (let column = toColumn; column >= fromColumn; --column) {
+    for (let row = toRow, visibleRowIndex = 0; row >= fromRow; --row, ++visibleRowIndex) {
+      for (let column = toColumn, visibleColumnIndex = 0; column >= fromColumn; --column, ++visibleColumnIndex) {
         const rowData = rows[row - fromRow];
         const columnData = columns[column - fromColumn];
 
-        cells.push(render(row, rowData, column, columnData, this));
+        cells.push(render(row, rowData, column, columnData, this, visibleRowIndex, visibleColumnIndex));
       }
     }
 
