@@ -1,6 +1,6 @@
 {
   "name": "react-virtual-grid",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Virtual Grid for React",
   "homepage": "http://github.com/fulcrumapp/react-virtual-grid",
   "main": "dist/index.js",
