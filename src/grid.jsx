@@ -820,7 +820,7 @@ export default class Grid extends React.Component {
       this._lastScrollableWidth = scrollableWidth;
       this._lastScrollableHeight = scrollableHeight;
 
-      setTimeout(() => this._scroller.refresh(), 0);
+      setTimeout(() => this._scroller.refresh(), 1);
     }
   }
 
