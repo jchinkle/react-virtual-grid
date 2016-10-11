@@ -26,6 +26,10 @@ var _iscrollProbe = require('iscroll/build/iscroll-probe');
 
 var _iscrollProbe2 = _interopRequireDefault(_iscrollProbe);
 
+var _reactAddonsCssTransitionGroup = require('react-addons-css-transition-group');
+
+var _reactAddonsCssTransitionGroup2 = _interopRequireDefault(_reactAddonsCssTransitionGroup);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
@@ -830,6 +834,14 @@ var Grid = function (_React$Component) {
       }
     }
 
+    if (this.props.transitionGroupProps) {
+      return _react2.default.createElement(
+        _reactAddonsCssTransitionGroup2.default,
+        this.props.transitionGroupProps,
+        cells
+      );
+    }
+
     return cells;
   };
 
@@ -977,7 +989,9 @@ Grid.propTypes = {
 
   onScrollEnd: _react2.default.PropTypes.func,
 
-  scrollOptions: _react2.default.PropTypes.object
+  scrollOptions: _react2.default.PropTypes.object,
+
+  transitionGroupProps: _react2.default.PropTypes.object
 };
 Grid.defaultProps = {
   preloadPixelsX: 0,
