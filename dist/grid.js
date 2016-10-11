@@ -774,7 +774,7 @@ var Grid = function (_React$Component) {
 
       setTimeout(function () {
         return _this4._scroller.refresh();
-      }, 0);
+      }, 1);
     }
   };
 
