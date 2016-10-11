@@ -71,7 +71,7 @@ export default class Example extends React.Component {
     const isFixed = column === 0 || row === 0 || column === this.state.columnCount - 1 || row === this.state.rowCount - 1;
 
     const left = column < 1 ? 0 : colLeft;
-    const top = row < 1 ? 0 : rowTop;
+    const top = 0;
 
     const attrs = { left, top, width, height, backgroundColor };
 

@@ -31,6 +31,8 @@ export default class Grid extends React.Component {
 
     rowHeight: React.PropTypes.oneOfType([ React.PropTypes.number, React.PropTypes.func ]),
 
+    renderRow: React.PropTypes.func,
+
     renderCell: React.PropTypes.func,
 
     onExtentsChange: React.PropTypes.func,
@@ -897,29 +899,55 @@ export default class Grid extends React.Component {
     return this.props.columnWidth(column);
   }
 
-  renderCellRange(fromRow, toRow, fromColumn, toColumn, rows, columns) {
-    const cells = [];
+  renderRow(cells, rowData, columnRange) {
+    const [ rowIndex, rowTop, height ] = rowData;
 
-    const render = this.props.renderCell;
+    const rowStyle = {
+      position: 'absolute',
+      left: 0,
+      top: rowTop,
+      height: height
+    };
+
+    return (
+      <div key={'row-' + rowIndex}
+           style={rowStyle}>
+        {cells}
+      </div>
+    );
+  }
+
+  renderCellRange(fromRow, toRow, fromColumn, toColumn, rows, columns) {
+    const rowRange = [];
+
+    const renderCell = this.props.renderCell;
+    const renderRow = this.props.renderRow || this.renderRow;
 
     for (let row = toRow, visibleRowIndex = 0; row >= fromRow; --row, ++visibleRowIndex) {
+      const rowCells = [];
+      const rowData = rows[row - fromRow];
+      const columnRange = [];
+
       for (let column = toColumn, visibleColumnIndex = 0; column >= fromColumn; --column, ++visibleColumnIndex) {
-        const rowData = rows[row - fromRow];
         const columnData = columns[column - fromColumn];
 
-        cells.push(render(row, rowData, column, columnData, this, visibleRowIndex, visibleColumnIndex));
+        columnRange.push(columnData);
+
+        rowCells.push(renderCell(row, rowData, column, columnData, this, visibleRowIndex, visibleColumnIndex));
       }
+
+      rowRange.push(renderRow(rowCells, rowData, columnRange));
     }
 
     if (this.props.transitionGroupProps) {
       return (
         <ReactCSSTransitionGroup {...this.props.transitionGroupProps}>
-          {cells}
+          {rowRange}
         </ReactCSSTransitionGroup>
       );
     }
 
-    return cells;
+    return rowRange;
   }
 
   get scrollTop() {
