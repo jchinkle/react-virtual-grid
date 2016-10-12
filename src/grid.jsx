@@ -5,6 +5,8 @@ import elementResizeDetector from 'element-resize-detector';
 import IScroll from 'iscroll/build/iscroll-probe';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
+/* eslint-disable react/no-unused-prop-types */
+
 export default class Grid extends React.Component {
   static propTypes = {
     preloadPixelsX: React.PropTypes.number,
@@ -96,6 +98,10 @@ export default class Grid extends React.Component {
     this._scroller.on('scrollEnd', this.handleScrollEnd);
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.refresh(true, nextProps);
+  }
+
   componentWillUnmount() {
     this._sizeDetector.uninstall(this._root);
 
@@ -111,8 +117,8 @@ export default class Grid extends React.Component {
     const contentStyle = {
       ...styles.scrollContent,
       position: 'absolute',
-      width: this.scrollableWidth,
-      height: this.scrollableHeight
+      width: this.calculateScrollableWidth(this.props),
+      height: this.calculateScrollableHeight(this.props)
     };
 
     return (
@@ -183,7 +189,7 @@ export default class Grid extends React.Component {
            style={attrs}>
         <div className={cx(styles.leftPaneHeaderContent)}
              style={contentStyle}>
-          {this.renderCellRange(0, this.props.fixedHeaderCount - 1, 0, this.props.fixedLeftColumnCount - 1, this.state.cells.topLeftRows, this.state.cells.topLeftColumns)}
+          {this.renderCellRange('left-pane-header', 0, this.props.fixedHeaderCount - 1, 0, this.props.fixedLeftColumnCount - 1, this.state.cells.topLeftRows, this.state.cells.topLeftColumns)}
         </div>
       </div>
     );
@@ -216,7 +222,7 @@ export default class Grid extends React.Component {
            style={attrs}>
         <div className={cx(styles.leftPaneFooterContent)}
              style={contentStyle}>
-          {this.renderCellRange(fromRow, toRow, 0, this.props.fixedLeftColumnCount - 1, this.state.cells.bottomLeftRows, this.state.cells.bottomLeftColumns)}
+          {this.renderCellRange('left-pane-footer', fromRow, toRow, 0, this.props.fixedLeftColumnCount - 1, this.state.cells.bottomLeftRows, this.state.cells.bottomLeftColumns)}
         </div>
       </div>
     );
@@ -253,7 +259,7 @@ export default class Grid extends React.Component {
            style={attrs}>
         <div className={cx(styles.leftPaneBodyContent)}
              style={contentStyle}>
-          {this.renderCellRange(fromRow, toRow, 0, this.props.fixedLeftColumnCount - 1, this.state.cells.leftRows, this.state.cells.leftColumns)}
+          {this.renderCellRange('left-pane-body', fromRow, toRow, 0, this.props.fixedLeftColumnCount - 1, this.state.cells.leftRows, this.state.cells.leftColumns)}
         </div>
       </div>
     );
@@ -310,7 +316,7 @@ export default class Grid extends React.Component {
            style={attrs}>
         <div className={cx(styles.rightPaneHeaderContent)}
              style={contentStyle}>
-          {this.renderCellRange(0, this.props.fixedHeaderCount - 1, fromColumn, toColumn, this.state.cells.topRightRows, this.state.cells.topRightColumns)}
+          {this.renderCellRange('right-pane-header', 0, this.props.fixedHeaderCount - 1, fromColumn, toColumn, this.state.cells.topRightRows, this.state.cells.topRightColumns)}
         </div>
       </div>
     );
@@ -346,7 +352,7 @@ export default class Grid extends React.Component {
            style={attrs}>
         <div className={cx(styles.rightPaneFooterContent)}
              style={contentStyle}>
-          {this.renderCellRange(fromRow, toRow, fromColumn, toColumn, this.state.cells.bottomRightRows, this.state.cells.bottomRightColumns)}
+          {this.renderCellRange('right-pane-footer', fromRow, toRow, fromColumn, toColumn, this.state.cells.bottomRightRows, this.state.cells.bottomRightColumns)}
         </div>
       </div>
     );
@@ -388,7 +394,7 @@ export default class Grid extends React.Component {
            style={attrs}>
         <div className={cx(styles.rightPaneBodyContent)}
              style={contentStyle}>
-          {this.renderCellRange(fromRow, toRow, fromColumn, toColumn, this.state.cells.rightRows, this.state.cells.rightColumns)}
+          {this.renderCellRange('right-pane-body', fromRow, toRow, fromColumn, toColumn, this.state.cells.rightRows, this.state.cells.rightColumns)}
         </div>
       </div>
     );
@@ -447,7 +453,7 @@ export default class Grid extends React.Component {
            style={attrs}>
         <div className={cx(styles.centerPaneHeaderContent)}
              style={contentStyle}>
-          {this.renderCellRange(0, this.props.fixedHeaderCount - 1, fromColumn, toColumn, this.state.cells.topRows, this.state.cells.topColumns)}
+          {this.renderCellRange('center-pane-header', 0, this.props.fixedHeaderCount - 1, fromColumn, toColumn, this.state.cells.topRows, this.state.cells.topColumns)}
         </div>
       </div>
     );
@@ -489,7 +495,7 @@ export default class Grid extends React.Component {
            style={attrs}>
         <div className={cx(styles.centerPaneHeaderContent)}
              style={contentStyle}>
-          {this.renderCellRange(fromRow, toRow, fromColumn, toColumn, this.state.cells.bottomRows, this.state.cells.bottomColumns)}
+          {this.renderCellRange('center-pane-footer', fromRow, toRow, fromColumn, toColumn, this.state.cells.bottomRows, this.state.cells.bottomColumns)}
         </div>
       </div>
     );
@@ -531,7 +537,7 @@ export default class Grid extends React.Component {
            style={attrs}>
         <div className={cx(styles.centerPaneBodyContent)}
              style={contentStyle}>
-          {this.renderCellRange(fromRow, toRow, fromColumn, toColumn, this.state.cells.rows, this.state.cells.columns)}
+          {this.renderCellRange('center-pane-body', fromRow, toRow, fromColumn, toColumn, this.state.cells.rows, this.state.cells.columns)}
         </div>
       </div>
     );
@@ -583,26 +589,26 @@ export default class Grid extends React.Component {
     return this._scrolling;
   }
 
-  get scrollableWidth() {
+  calculateScrollableWidth({estimatedColumnWidth, columnCount}) {
     if (!this.state.cells || !this.state.cells.columns.length) {
-      return this.props.estimatedColumnWidth * this.props.columnCount;
+      return estimatedColumnWidth * columnCount;
     }
 
     const lastColumn = this.state.cells.columns[this.state.cells.columns.length - 1];
     const width = lastColumn[1] + lastColumn[2];
 
-    return width + (((this.props.columnCount - 1) - lastColumn[0]) * this.props.estimatedColumnWidth);
+    return width + (((columnCount - 1) - lastColumn[0]) * estimatedColumnWidth);
   }
 
-  get scrollableHeight() {
+  calculateScrollableHeight({estimatedRowHeight, rowCount}) {
     if (!this.state.cells || !this.state.cells.rows.length) {
-      return this.props.estimatedRowHeight * this.props.rowCount;
+      return estimatedRowHeight * rowCount;
     }
 
     const lastRow = this.state.cells.rows[this.state.cells.rows.length - 1];
     const height = lastRow[1] + lastRow[2];
 
-    return height + (((this.props.rowCount - 1) - lastRow[0]) * this.props.estimatedRowHeight);
+    return height + (((rowCount - 1) - lastRow[0]) * estimatedRowHeight);
   }
 
   get fixedHeadersHeight() {
@@ -783,22 +789,24 @@ export default class Grid extends React.Component {
     this.calculator.invalidate();
   }
 
-  refresh = (force) => {
-    this.update(this.scrollTop, this.scrollLeft, force);
+  refresh = (force, props) => {
+    this.update(this.scrollTop, this.scrollLeft, force, props || this.props);
   }
 
-  update(scrollTop, scrollLeft, force) {
-    const x = scrollLeft - this.props.preloadPixelsX;
-    const y = scrollTop - this.props.preloadPixelsY;
+  update(scrollTop, scrollLeft, force, props) {
+    props = props || this.props;
+
+    const x = scrollLeft - props.preloadPixelsX;
+    const y = scrollTop - props.preloadPixelsY;
 
     const bounds = {
       left: Math.max(0, x),
       top: Math.max(0, y),
-      width: this._root.clientWidth + (2 * this.props.preloadPixelsX) + (x < 0 ? x : 0),
-      height: this._root.clientHeight + (2 * this.props.preloadPixelsY) + (y < 0 ? y : 0)
+      width: this._root.clientWidth + (2 * props.preloadPixelsX) + (x < 0 ? x : 0),
+      height: this._root.clientHeight + (2 * props.preloadPixelsY) + (y < 0 ? y : 0)
     };
 
-    const cells = this.calculator.cellsWithinBounds(bounds, this.props.rowCount, this.props.columnCount);
+    const cells = this.calculator.cellsWithinBounds(bounds, props.rowCount, props.columnCount);
 
     if (cells.changed || force) {
       const fromRow = cells.rows.length ? cells.rows[0][0] : null;
@@ -806,8 +814,8 @@ export default class Grid extends React.Component {
       const fromColumn = cells.columns.length ? cells.columns[0][0] : null;
       const toColumn = cells.columns.length ? cells.columns[cells.columns.length - 1][0] : null;
 
-      if (this.props.onExtentsChange) {
-        this.props.onExtentsChange(fromRow, toRow, fromColumn, toColumn);
+      if (props.onExtentsChange) {
+        props.onExtentsChange(fromRow, toRow, fromColumn, toColumn);
       }
 
       this.setState({cells: cells});
@@ -817,8 +825,8 @@ export default class Grid extends React.Component {
       this.setScroll(scrollLeft, scrollTop);
     }
 
-    const scrollableWidth = this.scrollableWidth;
-    const scrollableHeight = this.scrollableHeight;
+    const scrollableWidth = this.calculateScrollableWidth(props);
+    const scrollableHeight = this.calculateScrollableHeight(props);
 
     // if the srollable width or height changes, refresh the scroller
     if (force || this._lastScrollableWidth !== scrollableWidth || this._lastScrollableHeight !== scrollableHeight) {
@@ -899,7 +907,7 @@ export default class Grid extends React.Component {
     return this.props.columnWidth(column);
   }
 
-  renderRow(cells, rowData, columnRange) {
+  renderRow(pane, cells, rowData, columnRange) {
     const [ rowIndex, rowTop, height ] = rowData;
 
     const rowStyle = {
@@ -917,7 +925,7 @@ export default class Grid extends React.Component {
     );
   }
 
-  renderCellRange(fromRow, toRow, fromColumn, toColumn, rows, columns) {
+  renderCellRange(pane, fromRow, toRow, fromColumn, toColumn, rows, columns) {
     const rowRange = [];
 
     const renderCell = this.props.renderCell;
@@ -933,10 +941,10 @@ export default class Grid extends React.Component {
 
         columnRange.push(columnData);
 
-        rowCells.push(renderCell(row, rowData, column, columnData, this, visibleRowIndex, visibleColumnIndex));
+        rowCells.push(renderCell(pane, row, rowData, column, columnData, this, visibleRowIndex, visibleColumnIndex));
       }
 
-      rowRange.push(renderRow(rowCells, rowData, columnRange));
+      rowRange.push(renderRow(pane, rowCells, rowData, columnRange));
     }
 
     if (this.props.transitionGroupProps) {
