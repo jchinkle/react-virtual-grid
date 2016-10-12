@@ -873,6 +873,14 @@ export default class Grid extends React.Component {
     this._centerPane.style.top = y + 'px';
     this._centerPane.style.height = this._scrollOverlay.offsetHeight + 'px';
     this._centerPane.style.width = (this._scrollOverlay.offsetWidth - this.fixedRightColumnsWidth - this.fixedLeftColumnsWidth) + 'px';
+
+    if (this._scrollInner.childNodes[0].offsetHeight < this._scrollInner.offsetHeight) {
+      this._scrollInner.childNodes[0].style.height = this._scrollInner.offsetHeight + 'px';
+    }
+
+    if (this._scrollInner.childNodes[0].offsetWidth < this._scrollInner.offsetWidth) {
+      this._scrollInner.childNodes[0].style.width = this._scrollInner.offsetWidth + 'px';
+    }
   }
 
   get calculator() {
