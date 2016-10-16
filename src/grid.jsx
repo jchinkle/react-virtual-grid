@@ -865,12 +865,16 @@ export default class Grid extends React.Component {
       // offset with no data. For example, scroll down in a huge list of a results, then filter it to only a few results.
       // The scroll view is left at a large offset but there's no data. Because we don't know how far we'd have to move
       // up to find data, the simplest thing to do is to go to position 0, 0.
-      const diffY = (scrollTop + this._root.clientHeight) - Math.max(this._root.clientHeight, scrollableHeight);
-      const diffX = (scrollLeft + this._root.clientWidth) - Math.max(this._root.clientWidth, scrollableWidth);
+      const diffY = Math.max(0, (scrollTop + this._root.clientHeight) - Math.max(this._root.clientHeight, scrollableHeight));
+      const diffX = Math.max(0, (scrollLeft + this._root.clientWidth) - Math.max(this._root.clientWidth, scrollableWidth));
 
       setTimeout(() => {
         if (diffY > 0 || diffX > 0) {
-          this._scroller.scrollBy(-diffX, -diffY);
+          const updatedScrollLeft = scrollLeft - diffX;
+          const updatedScrollTop = scrollTop - diffY;
+
+          this._scroller.scrollTo(-updatedScrollLeft, -updatedScrollTop);
+          this.update(updatedScrollTop, updatedScrollLeft);
         }
 
         this._scroller.refresh();
