@@ -60,7 +60,7 @@ export default class Example extends React.Component {
     return CELL_SIZE;
   }
 
-  renderCell = (row, rowData, column, columnData) => {
+  renderCell = (pane, row, rowData, column, columnData) => {
     const [ colIndex, colLeft, width ] = columnData;
     const [ rowIndex, rowTop, height ] = rowData;
 
