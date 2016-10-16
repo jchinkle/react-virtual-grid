@@ -117,8 +117,8 @@ export default class Grid extends React.Component {
     const contentStyle = {
       ...styles.scrollContent,
       position: 'absolute',
-      width: this.calculateScrollableWidth(this.props, this.state),
-      height: this.calculateScrollableHeight(this.props, this.state)
+      width: this.calculateScrollableWidth(this.props, this.state.cells),
+      height: this.calculateScrollableHeight(this.props, this.state.cells)
     };
 
     return (
@@ -183,7 +183,7 @@ export default class Grid extends React.Component {
       left: 0,
       top: 0,
       right: 0,
-      height: this.fixedHeadersHeight
+      height: this.calculateFixedHeadersHeight(this.state.cells)
     };
 
     const contentStyle = {
@@ -215,7 +215,7 @@ export default class Grid extends React.Component {
       left: 0,
       bottom: 0,
       right: 0,
-      height: this.fixedFootersHeight
+      height: this.calculateFixedFootersHeight(this.state.cells)
     };
 
     const contentStyle = {
@@ -248,9 +248,9 @@ export default class Grid extends React.Component {
     const attrs = {
       ...styles.pane,
       left: 0,
-      top: this.fixedHeadersHeight,
+      top: this.calculateFixedHeadersHeight(this.state.cells),
       right: 0,
-      bottom: this.fixedFootersHeight
+      bottom: this.calculateFixedFootersHeight(this.state.cells)
     };
 
     const contentStyle = {
@@ -314,7 +314,7 @@ export default class Grid extends React.Component {
       left: 0,
       top: 0,
       right: 0,
-      height: this.fixedHeadersHeight
+      height: this.calculateFixedHeadersHeight(this.state.cells)
     };
 
     const contentStyle = {
@@ -349,7 +349,7 @@ export default class Grid extends React.Component {
       left: 0,
       bottom: 0,
       right: 0,
-      height: this.fixedFootersHeight
+      height: this.calculateFixedFootersHeight(this.state.cells)
     };
 
     const contentStyle = {
@@ -385,17 +385,17 @@ export default class Grid extends React.Component {
     const attrs = {
       ...styles.pane,
       left: 0,
-      top: this.fixedHeadersHeight,
+      top: this.calculateFixedHeadersHeight(this.state.cells),
       right: 0,
-      bottom: this.fixedFootersHeight
+      bottom: this.calculateFixedFootersHeight(this.state.cells)
     };
 
     const contentStyle = {
       position: 'absolute',
       width: this.props.estimatedColumnWidth,
       height: this.props.estimatedRowHeight * this.props.rowCount,
-      top: -this.fixedHeadersHeight,
-      bottom: -this.fixedFootersHeight,
+      top: -this.calculateFixedHeadersHeight(this.state.cells),
+      bottom: -this.calculateFixedFootersHeight(this.state.cells),
       ...styles.translatedPane
     };
 
@@ -452,7 +452,7 @@ export default class Grid extends React.Component {
       left: 0,
       top: 0,
       right: 0,
-      height: this.fixedHeadersHeight,
+      height: this.calculateFixedHeadersHeight(this.state.cells),
       overflow: 'visible' // TODO(zhm) this is needed for the column menus, what does it possibly break?
     };
 
@@ -493,7 +493,7 @@ export default class Grid extends React.Component {
       left: 0,
       bottom: 0,
       right: 0,
-      height: this.fixedFootersHeight,
+      height: this.calculateFixedFootersHeight(this.state.cells),
       overflow: 'visible' // TODO(zhm) this is needed for the column menus, what does it possibly break?
     };
 
@@ -535,9 +535,9 @@ export default class Grid extends React.Component {
     const attrs = {
       ...styles.pane,
       left: 0,
-      top: this.fixedHeadersHeight,
+      top: this.calculateFixedHeadersHeight(this.state.cells),
       right: 0,
-      bottom: this.fixedFootersHeight
+      bottom: this.calculateFixedFootersHeight(this.state.cells)
     };
 
     const contentStyle = {
@@ -545,7 +545,7 @@ export default class Grid extends React.Component {
       width: this.props.estimatedColumnWidth * this.props.columnCount,
       height: this.props.estimatedRowHeight * this.props.rowCount,
       left: -this.fixedLeftColumnsWidth,
-      top: -this.fixedHeadersHeight,
+      top: -this.calculateFixedHeadersHeight(this.state.cells),
       ...styles.translatedPane
     };
 
@@ -617,7 +617,7 @@ export default class Grid extends React.Component {
     return this._scrolling;
   }
 
-  calculateScrollableWidth({estimatedColumnWidth, columnCount}, {cells}) {
+  calculateScrollableWidth({estimatedColumnWidth, columnCount}, cells) {
     if (!cells || !cells.columns.length) {
       return estimatedColumnWidth * columnCount;
     }
@@ -628,7 +628,7 @@ export default class Grid extends React.Component {
     return width + (((columnCount - 1) - lastColumn[0]) * estimatedColumnWidth);
   }
 
-  calculateScrollableHeight({estimatedRowHeight, rowCount}, {cells}) {
+  calculateScrollableHeight({estimatedRowHeight, rowCount}, cells) {
     if (!cells || !cells.rows.length) {
       return estimatedRowHeight * rowCount;
     }
@@ -639,23 +639,23 @@ export default class Grid extends React.Component {
     return height + (((rowCount - 1) - lastRow[0]) * estimatedRowHeight);
   }
 
-  get fixedHeadersHeight() {
-    if (!this.state.cells || !this.state.cells.topLeftRows.length) {
+  calculateFixedHeadersHeight(cells) {
+    if (!cells || !cells.topLeftRows.length) {
       return 0;
     }
 
-    const lastTopLeftRow = this.state.cells.topLeftRows[this.state.cells.topLeftRows.length - 1];
+    const lastTopLeftRow = cells.topLeftRows[cells.topLeftRows.length - 1];
     const topOffset = lastTopLeftRow[1] + lastTopLeftRow[2];
 
     return topOffset;
   }
 
-  get fixedFootersHeight() {
-    if (!this.state.cells || !this.state.cells.bottomLeftRows.length) {
+  calculateFixedFootersHeight(cells) {
+    if (!cells || !cells.bottomLeftRows.length) {
       return 0;
     }
 
-    const lastBottomRow = this.state.cells.bottomLeftRows[this.state.cells.bottomLeftRows.length - 1];
+    const lastBottomRow = cells.bottomLeftRows[cells.bottomLeftRows.length - 1];
     const lastBottomRowTop = lastBottomRow[1] + lastBottomRow[2];
 
     return lastBottomRowTop;
@@ -849,12 +849,12 @@ export default class Grid extends React.Component {
       this.setState({cells: cells});
     }
 
-    if (this.state.cells) {
-      this.setScroll(scrollLeft, scrollTop);
+    if (cells) {
+      this.setScroll(scrollLeft, scrollTop, cells);
     }
 
-    const scrollableWidth = this.calculateScrollableWidth(props, {cells});
-    const scrollableHeight = this.calculateScrollableHeight(props, {cells});
+    const scrollableWidth = this.calculateScrollableWidth(props, cells);
+    const scrollableHeight = this.calculateScrollableHeight(props, cells);
 
     // if the srollable width or height changes, refresh the scroller
     if (force || this._lastScrollableWidth !== scrollableWidth || this._lastScrollableHeight !== scrollableHeight) {
@@ -865,17 +865,28 @@ export default class Grid extends React.Component {
       // offset with no data. For example, scroll down in a huge list of a results, then filter it to only a few results.
       // The scroll view is left at a large offset but there's no data. Because we don't know how far we'd have to move
       // up to find data, the simplest thing to do is to go to position 0, 0.
-      setTimeout(() => this._scroller.refresh(), 1);
+      const diffY = (scrollTop + this._root.clientHeight) - Math.max(this._root.clientHeight, scrollableHeight);
+      const diffX = (scrollLeft + this._root.clientWidth) - Math.max(this._root.clientWidth, scrollableWidth);
+
+      setTimeout(() => {
+        if (diffY !== 0 || diffX !== 0) {
+          this._scroller.scrollBy(-diffX, -diffY);
+        }
+
+        this._scroller.refresh();
+      }, 1);
     }
   }
 
-  setScroll(x, y) {
+  setScroll(x, y, cells) {
+    const fixedHeadersHeight = this.calculateFixedHeadersHeight(cells);
+
     if (this._leftPaneBody) {
-      this._leftPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+      this._leftPaneBody.childNodes[0].style.top = (-y - fixedHeadersHeight) + 'px';
     }
 
     if (this._rightPaneBody) {
-      this._rightPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+      this._rightPaneBody.childNodes[0].style.top = (-y - fixedHeadersHeight) + 'px';
     }
 
     if (this._centerPaneHeader) {
@@ -886,7 +897,7 @@ export default class Grid extends React.Component {
       this._centerPaneFooter.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
     }
 
-    this._centerPaneBody.childNodes[0].style.top = (-y - this.fixedHeadersHeight) + 'px';
+    this._centerPaneBody.childNodes[0].style.top = (-y - fixedHeadersHeight) + 'px';
     this._centerPaneBody.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
 
     if (this._leftPane) {
