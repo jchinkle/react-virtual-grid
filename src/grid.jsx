@@ -869,9 +869,9 @@ export default class Grid extends React.Component {
       const diffX = (scrollLeft + this._root.clientWidth) - Math.max(this._root.clientWidth, scrollableWidth);
 
       setTimeout(() => {
-        // if (diffY !== 0 || diffX !== 0) {
-        //   this._scroller.scrollBy(-diffX, -diffY);
-        // }
+        if (diffY > 0 || diffX > 0) {
+          this._scroller.scrollBy(-diffX, -diffY);
+        }
 
         this._scroller.refresh();
       }, 1);
