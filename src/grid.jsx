@@ -869,9 +869,9 @@ export default class Grid extends React.Component {
       const diffX = (scrollLeft + this._root.clientWidth) - Math.max(this._root.clientWidth, scrollableWidth);
 
       setTimeout(() => {
-        if (diffY !== 0 || diffX !== 0) {
-          this._scroller.scrollBy(-diffX, -diffY);
-        }
+        // if (diffY !== 0 || diffX !== 0) {
+        //   this._scroller.scrollBy(-diffX, -diffY);
+        // }
 
         this._scroller.refresh();
       }, 1);
@@ -897,8 +897,10 @@ export default class Grid extends React.Component {
       this._centerPaneFooter.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
     }
 
-    this._centerPaneBody.childNodes[0].style.top = (-y - fixedHeadersHeight) + 'px';
-    this._centerPaneBody.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
+    if (this._centerPaneBody) {
+      this._centerPaneBody.childNodes[0].style.top = (-y - fixedHeadersHeight) + 'px';
+      this._centerPaneBody.childNodes[0].style.left = (-x - this.fixedLeftColumnsWidth) + 'px';
+    }
 
     if (this._leftPane) {
       this._leftPane.style.left = x + 'px';
@@ -912,17 +914,21 @@ export default class Grid extends React.Component {
       this._rightPane.style.height = this._scrollOverlay.offsetHeight + 'px';
     }
 
-    this._centerPane.style.left = (x + this.fixedLeftColumnsWidth) + 'px';
-    this._centerPane.style.top = y + 'px';
-    this._centerPane.style.height = this._scrollOverlay.offsetHeight + 'px';
-    this._centerPane.style.width = (this._scrollOverlay.offsetWidth - this.fixedRightColumnsWidth - this.fixedLeftColumnsWidth) + 'px';
-
-    if (this._scrollInner.childNodes[0].offsetHeight < this._scrollInner.offsetHeight) {
-      this._scrollInner.childNodes[0].style.height = this._scrollInner.offsetHeight + 'px';
+    if (this._centerPane) {
+      this._centerPane.style.left = (x + this.fixedLeftColumnsWidth) + 'px';
+      this._centerPane.style.top = y + 'px';
+      this._centerPane.style.height = this._scrollOverlay.offsetHeight + 'px';
+      this._centerPane.style.width = (this._scrollOverlay.offsetWidth - this.fixedRightColumnsWidth - this.fixedLeftColumnsWidth) + 'px';
     }
 
-    if (this._scrollInner.childNodes[0].offsetWidth < this._scrollInner.offsetWidth) {
-      this._scrollInner.childNodes[0].style.width = this._scrollInner.offsetWidth + 'px';
+    if (this._scrollInner) {
+      if (this._scrollInner.childNodes[0].offsetHeight < this._scrollInner.offsetHeight) {
+        this._scrollInner.childNodes[0].style.height = this._scrollInner.offsetHeight + 'px';
+      }
+
+      if (this._scrollInner.childNodes[0].offsetWidth < this._scrollInner.offsetWidth) {
+        this._scrollInner.childNodes[0].style.width = this._scrollInner.offsetWidth + 'px';
+      }
     }
   }
 
