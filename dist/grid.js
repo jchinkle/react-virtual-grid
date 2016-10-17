@@ -26,10 +26,6 @@ var _iscrollProbe = require('iscroll/build/iscroll-probe');
 
 var _iscrollProbe2 = _interopRequireDefault(_iscrollProbe);
 
-var _reactAddonsCssTransitionGroup = require('react-addons-css-transition-group');
-
-var _reactAddonsCssTransitionGroup2 = _interopRequireDefault(_reactAddonsCssTransitionGroup);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
@@ -804,12 +800,22 @@ var Grid = function (_React$Component) {
       height: height
     };
 
+    var renderCells = this.props.renderCells || this.renderCells;
+
     return _react2.default.createElement(
       'div',
       { key: 'row-' + rowIndex,
         style: rowStyle },
-      cells
+      renderCells(cells)
     );
+  };
+
+  Grid.prototype.renderCells = function renderCells(cells) {
+    return cells;
+  };
+
+  Grid.prototype.renderRows = function renderRows(rows) {
+    return rows;
   };
 
   Grid.prototype.renderCellRange = function renderCellRange(pane, fromRow, toRow, fromColumn, toColumn, rows, columns) {
@@ -817,6 +823,7 @@ var Grid = function (_React$Component) {
 
     var renderCell = this.props.renderCell;
     var renderRow = this.props.renderRow || this.renderRow;
+    var renderRows = this.props.renderRows || this.renderRows;
 
     for (var row = toRow, visibleRowIndex = 0; row >= fromRow; --row, ++visibleRowIndex) {
       var rowCells = [];
@@ -834,15 +841,7 @@ var Grid = function (_React$Component) {
       rowRange.push(renderRow(pane, rowCells, rowData, columnRange));
     }
 
-    if (this.props.transitionGroupProps) {
-      return _react2.default.createElement(
-        _reactAddonsCssTransitionGroup2.default,
-        this.props.transitionGroupProps,
-        rowRange
-      );
-    }
-
-    return rowRange;
+    return renderRows(rowRange);
   };
 
   _createClass(Grid, [{
@@ -933,7 +932,11 @@ Grid.propTypes = {
 
   renderRow: _react2.default.PropTypes.func,
 
+  renderRows: _react2.default.PropTypes.func,
+
   renderCell: _react2.default.PropTypes.func,
+
+  renderCells: _react2.default.PropTypes.func,
 
   onExtentsChange: _react2.default.PropTypes.func,
 
@@ -943,9 +946,7 @@ Grid.propTypes = {
 
   onScrollEnd: _react2.default.PropTypes.func,
 
-  scrollOptions: _react2.default.PropTypes.object,
-
-  transitionGroupProps: _react2.default.PropTypes.object
+  scrollOptions: _react2.default.PropTypes.object
 };
 Grid.defaultProps = {
   preloadPixelsX: 0,
