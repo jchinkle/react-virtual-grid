@@ -1,6 +1,6 @@
 {
   "name": "react-virtual-grid",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Virtual Grid for React",
   "homepage": "http://github.com/fulcrumapp/react-virtual-grid",
   "main": "dist/index.js",
@@ -70,7 +70,7 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "element-resize-detector": "^1.1.9",
-    "iscroll": "github:zhm/iscroll#horizontal-scroll-fix"
+    "iscroll": "github:zhm/iscroll#larger-scrollbars"
   },
   "keywords": [
     "grid",
