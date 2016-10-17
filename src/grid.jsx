@@ -3,7 +3,6 @@ import cx from 'classnames';
 import GridCalculator from './grid-calculator';
 import elementResizeDetector from 'element-resize-detector';
 import IScroll from 'iscroll/build/iscroll-probe';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 /* eslint-disable react/no-unused-prop-types */
 
@@ -35,7 +34,11 @@ export default class Grid extends React.Component {
 
     renderRow: React.PropTypes.func,
 
+    renderRows: React.PropTypes.func,
+
     renderCell: React.PropTypes.func,
+
+    renderCells: React.PropTypes.func,
 
     onExtentsChange: React.PropTypes.func,
 
@@ -45,9 +48,7 @@ export default class Grid extends React.Component {
 
     onScrollEnd: React.PropTypes.func,
 
-    scrollOptions: React.PropTypes.object,
-
-    transitionGroupProps: React.PropTypes.object
+    scrollOptions: React.PropTypes.object
   };
 
   static defaultProps = {
@@ -978,12 +979,22 @@ export default class Grid extends React.Component {
       height: height
     };
 
+    const renderCells = this.props.renderCells || this.renderCells;
+
     return (
       <div key={'row-' + rowIndex}
            style={rowStyle}>
-        {cells}
+        {renderCells(cells)}
       </div>
     );
+  }
+
+  renderCells(cells) {
+    return cells;
+  }
+
+  renderRows(rows) {
+    return rows;
   }
 
   renderCellRange(pane, fromRow, toRow, fromColumn, toColumn, rows, columns) {
@@ -991,6 +1002,7 @@ export default class Grid extends React.Component {
 
     const renderCell = this.props.renderCell;
     const renderRow = this.props.renderRow || this.renderRow;
+    const renderRows = this.props.renderRows || this.renderRows;
 
     for (let row = toRow, visibleRowIndex = 0; row >= fromRow; --row, ++visibleRowIndex) {
       const rowCells = [];
@@ -1008,15 +1020,7 @@ export default class Grid extends React.Component {
       rowRange.push(renderRow(pane, rowCells, rowData, columnRange));
     }
 
-    if (this.props.transitionGroupProps) {
-      return (
-        <ReactCSSTransitionGroup {...this.props.transitionGroupProps}>
-          {rowRange}
-        </ReactCSSTransitionGroup>
-      );
-    }
-
-    return rowRange;
+    return renderRows(rowRange);
   }
 
   get scrollTop() {

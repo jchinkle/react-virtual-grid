@@ -1,6 +1,6 @@
 {
   "name": "react-virtual-grid",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "Virtual Grid for React",
   "homepage": "http://github.com/fulcrumapp/react-virtual-grid",
   "main": "dist/index.js",
@@ -64,8 +64,7 @@
   },
   "peerDependencies": {
     "react": "^15.3.2",
-    "react-dom": "^15.3.2",
-    "react-addons-css-transition-group": "^15.3.2"
+    "react-dom": "^15.3.2"
   },
   "dependencies": {
     "classnames": "^2.2.5",
