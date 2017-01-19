@@ -52,7 +52,7 @@ export default class GridCalculator {
     let found = false;
 
     // find the first edge
-    while (!found) {
+    while (!found && index < maxCells) {
       const size = this.getSize(index, cache, calculateSize, estimatedSize);
 
       if (pixel + size > minPixel) {
