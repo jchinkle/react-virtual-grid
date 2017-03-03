@@ -671,6 +671,10 @@ var Grid = function (_React$Component) {
   Grid.prototype.update = function update(scrollTop, scrollLeft, force, props) {
     var _this4 = this;
 
+    if (!this._root) {
+      return;
+    }
+
     props = props || this.props;
 
     var x = scrollLeft - props.preloadPixelsX;

@@ -823,6 +823,10 @@ export default class Grid extends React.Component {
   }
 
   update(scrollTop, scrollLeft, force, props) {
+    if (!this._root) {
+      return;
+    }
+
     props = props || this.props;
 
     const x = scrollLeft - props.preloadPixelsX;
