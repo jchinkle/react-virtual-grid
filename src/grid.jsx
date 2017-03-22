@@ -583,7 +583,8 @@ export default class Grid extends React.Component {
 
     const guideStyle = {
       ...styles.columnResizeGuide,
-      left: column[1] + column[2] - 2
+      left: column[1] + column[2],
+      top: this._centerPaneBody.offsetTop - 1
     };
 
     return (
@@ -605,7 +606,8 @@ export default class Grid extends React.Component {
 
     const guideStyle = {
       ...styles.rowResizeGuide,
-      top: row[1] + row[2] - 2
+      top: row[1] + row[2],
+      left: this._centerPaneBody.offsetLeft - 1
     };
 
     return (
@@ -973,6 +975,22 @@ export default class Grid extends React.Component {
     return this.props.columnWidth(column);
   }
 
+  clearPinnedWidths() {
+    this._pinnedColumnWidths = {};
+  }
+
+  clearPinnedWidth(columnIndex) {
+    delete this._pinnedColumnWidths[columnIndex];
+  }
+
+  clearPinnedHeights() {
+    this._pinnedRowHeights = {};
+  }
+
+  clearPinnedHeight(rowIndex) {
+    delete this._pinnedRowHeights[rowIndex];
+  }
+
   renderRow(pane, cells, rowData, columnRange) {
     const [ rowIndex, rowTop, height ] = rowData;
 
@@ -1083,7 +1101,7 @@ const styles = {
     position: 'absolute',
     top: 1,
     bottom: 0,
-    width: 4,
+    width: 1,
     backgroundColor: '#18a3f7',
     cursor: 'ew-resize',
     borderRadius: 0
@@ -1093,7 +1111,7 @@ const styles = {
     position: 'absolute',
     left: 1,
     right: 0,
-    height: 4,
+    height: 1,
     backgroundColor: '#18a3f7',
     cursor: 'ns-resize',
     borderRadius: 0

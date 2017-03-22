@@ -6,9 +6,11 @@ export default class ResizableCell extends React.Component {
     onColumnResizeStart: React.PropTypes.func,
     onColumnResize: React.PropTypes.func,
     onColumnResizeEnd: React.PropTypes.func,
+    onColumnResizeDoubleClick: React.PropTypes.func,
     onRowResizeStart: React.PropTypes.func,
     onRowResize: React.PropTypes.func,
     onRowResizeEnd: React.PropTypes.func,
+    onRowResizeDoubleClick: React.PropTypes.func,
     width: React.PropTypes.number.isRequired,
     height: React.PropTypes.number.isRequired,
     rowIndex: React.PropTypes.number.isRequired,
@@ -19,7 +21,8 @@ export default class ResizableCell extends React.Component {
     return (
       <ResizeHandle onResizeStart={this.handleColumnResizeStart}
                     onResize={this.handleColumnResize}
-                    onResizeEnd={this.handleColumnResizeEnd} />
+                    onResizeEnd={this.handleColumnResizeEnd}
+                    onResizeDoubleClick={this.handleColumnResizeDoubleClick} />
     );
   }
 
@@ -28,8 +31,15 @@ export default class ResizableCell extends React.Component {
       <ResizeHandle onResizeStart={this.handleRowResizeStart}
                     onResize={this.handleRowResize}
                     onResizeEnd={this.handleRowResizeEnd}
+                    onResizeDoubleClick={this.handleRowResizeDoubleClick}
                     dimension="height" />
     );
+  }
+
+  handleColumnResizeDoubleClick = () => {
+    if (this.props.onColumnResizeDoubleClick) {
+      this.props.onColumnResizeDoubleClick(this.props);
+    }
   }
 
   handleColumnResizeStart = (widthChange, heightChange) => {
@@ -41,6 +51,12 @@ export default class ResizableCell extends React.Component {
   handleColumnResize = (widthChange, heightChange) => {
     if (this.props.onColumnResize) {
       this.props.onColumnResize(this.props.columnIndex, this.props.width + widthChange);
+    }
+  }
+
+  handleRowResizeDoubleClick = () => {
+    if (this.props.onRowResizeDoubleClick) {
+      this.props.onRowResizeDoubleClick(this.props);
     }
   }
 

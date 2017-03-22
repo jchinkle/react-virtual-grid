@@ -2,11 +2,14 @@
 
 import React from 'react';
 
+const DOUBLE_CLICK_DELAY = 500;
+
 export default class ResizeHandle extends React.Component {
   static propTypes = {
     onResizeStart: React.PropTypes.func,
     onResize: React.PropTypes.func,
     onResizeEnd: React.PropTypes.func,
+    onResizeDoubleClick: React.PropTypes.func,
     dimension: React.PropTypes.string
   };
 
@@ -19,6 +22,7 @@ export default class ResizeHandle extends React.Component {
 
     this._pageX = null;
     this._pageY = null;
+    this._clickCount = 0;
 
     this.state = {
       dragging: false,
@@ -78,6 +82,21 @@ export default class ResizeHandle extends React.Component {
   }
 
   handleMouseDown = (event) => {
+    this._clickCount++;
+
+    setTimeout(() => {
+      this._clickCount = Math.max(0, this._clickCount - 1);
+    }, DOUBLE_CLICK_DELAY);
+
+    if (this._clickCount > 1) {
+      this._clickCount = 0;
+
+      if (this.props.onResizeDoubleClick) {
+        this.props.onResizeDoubleClick();
+        return;
+      }
+    }
+
     this.start(event.pageX, event.pageY);
 
     event.preventDefault();
