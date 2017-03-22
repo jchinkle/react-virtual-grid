@@ -606,8 +606,8 @@ export default class Grid extends React.Component {
 
     const guideStyle = {
       ...styles.rowResizeGuide,
-      top: row[1] + row[2],
-      left: this._centerPaneBody.offsetLeft - 1
+      top: row[1] + row[2] - 1,
+      left: this._leftPane.offsetWidth
     };
 
     return (

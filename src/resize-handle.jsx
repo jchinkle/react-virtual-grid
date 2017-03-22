@@ -203,10 +203,10 @@ const styles = {
 
   lineWidth: {
     position: 'absolute',
-    left: 6,
-    top: 0,
-    width: 4,
-    bottom: 0,
+    left: 7,
+    top: -2,
+    width: 3,
+    bottom: -1,
     backgroundColor: 'transparent',
     opacity: 1,
     borderRadius: 0
@@ -215,9 +215,9 @@ const styles = {
   lineHeight: {
     position: 'absolute',
     top: 6,
-    left: 0,
-    right: 0,
-    height: 4,
+    left: -1,
+    right: -1,
+    height: 3,
     backgroundColor: 'transparent',
     opacity: 1,
     borderRadius: 0
