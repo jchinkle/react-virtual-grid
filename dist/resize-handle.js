@@ -226,9 +226,9 @@ var styles = {
   lineWidth: {
     position: 'absolute',
     left: 6,
-    top: 0,
-    width: 4,
-    bottom: 0,
+    top: -2,
+    width: 5,
+    bottom: -1,
     backgroundColor: 'transparent',
     opacity: 1,
     borderRadius: 0
@@ -236,10 +236,10 @@ var styles = {
 
   lineHeight: {
     position: 'absolute',
-    top: 6,
-    left: 0,
-    right: 0,
-    height: 4,
+    top: 5,
+    left: -1,
+    right: -1,
+    height: 5,
     backgroundColor: 'transparent',
     opacity: 1,
     borderRadius: 0

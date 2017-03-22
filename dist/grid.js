@@ -608,8 +608,8 @@ var Grid = function (_React$Component) {
     });
 
     var guideStyle = _extends({}, styles.rowResizeGuide, {
-      top: row[1] + row[2],
-      left: this._centerPaneBody.offsetLeft - 1
+      top: row[1] + row[2] - 1,
+      left: this._leftPane.offsetWidth
     });
 
     return _react2.default.createElement('div', { style: guideStyle,
