@@ -32,13 +32,21 @@ var ResizableCell = function (_React$Component) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn(this, _React$Component.call.apply(_React$Component, [this].concat(args))), _this), _this.handleColumnResizeStart = function (widthChange, heightChange) {
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, _React$Component.call.apply(_React$Component, [this].concat(args))), _this), _this.handleColumnResizeDoubleClick = function () {
+      if (_this.props.onColumnResizeDoubleClick) {
+        _this.props.onColumnResizeDoubleClick(_this.props);
+      }
+    }, _this.handleColumnResizeStart = function (widthChange, heightChange) {
       if (_this.props.onColumnResizeStart) {
         _this.props.onColumnResizeStart(_this.props.columnIndex, _this.props.width + widthChange);
       }
     }, _this.handleColumnResize = function (widthChange, heightChange) {
       if (_this.props.onColumnResize) {
         _this.props.onColumnResize(_this.props.columnIndex, _this.props.width + widthChange);
+      }
+    }, _this.handleRowResizeDoubleClick = function () {
+      if (_this.props.onRowResizeDoubleClick) {
+        _this.props.onRowResizeDoubleClick(_this.props);
       }
     }, _this.handleColumnResizeEnd = function () {
       if (_this.props.onColumnResizeEnd) {
@@ -62,13 +70,15 @@ var ResizableCell = function (_React$Component) {
   ResizableCell.prototype.renderColumnResizeHandle = function renderColumnResizeHandle() {
     return _react2.default.createElement(_resizeHandle2.default, { onResizeStart: this.handleColumnResizeStart,
       onResize: this.handleColumnResize,
-      onResizeEnd: this.handleColumnResizeEnd });
+      onResizeEnd: this.handleColumnResizeEnd,
+      onResizeDoubleClick: this.handleColumnResizeDoubleClick });
   };
 
   ResizableCell.prototype.renderRowResizeHandle = function renderRowResizeHandle() {
     return _react2.default.createElement(_resizeHandle2.default, { onResizeStart: this.handleRowResizeStart,
       onResize: this.handleRowResize,
       onResizeEnd: this.handleRowResizeEnd,
+      onResizeDoubleClick: this.handleRowResizeDoubleClick,
       dimension: 'height' });
   };
 
@@ -79,9 +89,11 @@ ResizableCell.propTypes = {
   onColumnResizeStart: _react2.default.PropTypes.func,
   onColumnResize: _react2.default.PropTypes.func,
   onColumnResizeEnd: _react2.default.PropTypes.func,
+  onColumnResizeDoubleClick: _react2.default.PropTypes.func,
   onRowResizeStart: _react2.default.PropTypes.func,
   onRowResize: _react2.default.PropTypes.func,
   onRowResizeEnd: _react2.default.PropTypes.func,
+  onRowResizeDoubleClick: _react2.default.PropTypes.func,
   width: _react2.default.PropTypes.number.isRequired,
   height: _react2.default.PropTypes.number.isRequired,
   rowIndex: _react2.default.PropTypes.number.isRequired,

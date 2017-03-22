@@ -585,7 +585,8 @@ var Grid = function (_React$Component) {
     });
 
     var guideStyle = _extends({}, styles.columnResizeGuide, {
-      left: column[1] + column[2] - 2
+      left: column[1] + column[2],
+      top: this._centerPaneBody.offsetTop - 1
     });
 
     return _react2.default.createElement('div', { style: guideStyle,
@@ -607,7 +608,8 @@ var Grid = function (_React$Component) {
     });
 
     var guideStyle = _extends({}, styles.rowResizeGuide, {
-      top: row[1] + row[2] - 2
+      top: row[1] + row[2],
+      left: this._centerPaneBody.offsetLeft - 1
     });
 
     return _react2.default.createElement('div', { style: guideStyle,
@@ -615,8 +617,8 @@ var Grid = function (_React$Component) {
   };
 
   Grid.prototype.calculateScrollableWidth = function calculateScrollableWidth(_ref, cells) {
-    var estimatedColumnWidth = _ref.estimatedColumnWidth;
-    var columnCount = _ref.columnCount;
+    var estimatedColumnWidth = _ref.estimatedColumnWidth,
+        columnCount = _ref.columnCount;
 
     if (!cells || !cells.columns.length) {
       return estimatedColumnWidth * columnCount;
@@ -629,8 +631,8 @@ var Grid = function (_React$Component) {
   };
 
   Grid.prototype.calculateScrollableHeight = function calculateScrollableHeight(_ref2, cells) {
-    var estimatedRowHeight = _ref2.estimatedRowHeight;
-    var rowCount = _ref2.rowCount;
+    var estimatedRowHeight = _ref2.estimatedRowHeight,
+        rowCount = _ref2.rowCount;
 
     if (!cells || !cells.rows.length) {
       return estimatedRowHeight * rowCount;
@@ -711,29 +713,27 @@ var Grid = function (_React$Component) {
 
     // if the srollable width or height changes, refresh the scroller
     if (force || this._lastScrollableWidth !== scrollableWidth || this._lastScrollableHeight !== scrollableHeight) {
-      (function () {
-        _this4._lastScrollableWidth = scrollableWidth;
-        _this4._lastScrollableHeight = scrollableHeight;
+      this._lastScrollableWidth = scrollableWidth;
+      this._lastScrollableHeight = scrollableHeight;
 
-        // if there were no cells, there might be more cells above. This handles a case where the table renders at a scroll
-        // offset with no data. For example, scroll down in a huge list of a results, then filter it to only a few results.
-        // The scroll view is left at a large offset but there's no data. Because we don't know how far we'd have to move
-        // up to find data, the simplest thing to do is to go to position 0, 0.
-        var diffY = Math.max(0, scrollTop + _this4._root.clientHeight - Math.max(_this4._root.clientHeight, scrollableHeight));
-        var diffX = Math.max(0, scrollLeft + _this4._root.clientWidth - Math.max(_this4._root.clientWidth, scrollableWidth));
+      // if there were no cells, there might be more cells above. This handles a case where the table renders at a scroll
+      // offset with no data. For example, scroll down in a huge list of a results, then filter it to only a few results.
+      // The scroll view is left at a large offset but there's no data. Because we don't know how far we'd have to move
+      // up to find data, the simplest thing to do is to go to position 0, 0.
+      var diffY = Math.max(0, scrollTop + this._root.clientHeight - Math.max(this._root.clientHeight, scrollableHeight));
+      var diffX = Math.max(0, scrollLeft + this._root.clientWidth - Math.max(this._root.clientWidth, scrollableWidth));
 
-        setTimeout(function () {
-          if (diffY > 0 || diffX > 0) {
-            var updatedScrollLeft = scrollLeft - diffX;
-            var updatedScrollTop = scrollTop - diffY;
+      setTimeout(function () {
+        if (diffY > 0 || diffX > 0) {
+          var updatedScrollLeft = scrollLeft - diffX;
+          var updatedScrollTop = scrollTop - diffY;
 
-            _this4._scroller.scrollTo(-updatedScrollLeft, -updatedScrollTop);
-            _this4.update(updatedScrollTop, updatedScrollLeft);
-          }
+          _this4._scroller.scrollTo(-updatedScrollLeft, -updatedScrollTop);
+          _this4.update(updatedScrollTop, updatedScrollLeft);
+        }
 
-          _this4._scroller.refresh();
-        }, 1);
-      })();
+        _this4._scroller.refresh();
+      }, 1);
     }
   };
 
@@ -791,10 +791,26 @@ var Grid = function (_React$Component) {
     }
   };
 
+  Grid.prototype.clearPinnedWidths = function clearPinnedWidths() {
+    this._pinnedColumnWidths = {};
+  };
+
+  Grid.prototype.clearPinnedWidth = function clearPinnedWidth(columnIndex) {
+    delete this._pinnedColumnWidths[columnIndex];
+  };
+
+  Grid.prototype.clearPinnedHeights = function clearPinnedHeights() {
+    this._pinnedRowHeights = {};
+  };
+
+  Grid.prototype.clearPinnedHeight = function clearPinnedHeight(rowIndex) {
+    delete this._pinnedRowHeights[rowIndex];
+  };
+
   Grid.prototype.renderRow = function renderRow(pane, cells, rowData, columnRange) {
-    var rowIndex = rowData[0];
-    var rowTop = rowData[1];
-    var height = rowData[2];
+    var rowIndex = rowData[0],
+        rowTop = rowData[1],
+        height = rowData[2];
 
 
     var rowStyle = {
@@ -1166,7 +1182,7 @@ var styles = {
     position: 'absolute',
     top: 1,
     bottom: 0,
-    width: 4,
+    width: 1,
     backgroundColor: '#18a3f7',
     cursor: 'ew-resize',
     borderRadius: 0
@@ -1176,7 +1192,7 @@ var styles = {
     position: 'absolute',
     left: 1,
     right: 0,
-    height: 4,
+    height: 1,
     backgroundColor: '#18a3f7',
     cursor: 'ns-resize',
     borderRadius: 0

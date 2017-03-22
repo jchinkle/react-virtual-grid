@@ -18,6 +18,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); } /* eslint-disable react/style-prop-object */
 
+var DOUBLE_CLICK_DELAY = 500;
+
 var ResizeHandle = function (_React$Component) {
   _inherits(ResizeHandle, _React$Component);
 
@@ -41,6 +43,21 @@ var ResizeHandle = function (_React$Component) {
     };
 
     _this.handleMouseDown = function (event) {
+      _this._clickCount++;
+
+      setTimeout(function () {
+        _this._clickCount = Math.max(0, _this._clickCount - 1);
+      }, DOUBLE_CLICK_DELAY);
+
+      if (_this._clickCount > 1) {
+        _this._clickCount = 0;
+
+        if (_this.props.onResizeDoubleClick) {
+          _this.props.onResizeDoubleClick();
+          return;
+        }
+      }
+
       _this.start(event.pageX, event.pageY);
 
       event.preventDefault();
@@ -64,6 +81,7 @@ var ResizeHandle = function (_React$Component) {
 
     _this._pageX = null;
     _this._pageY = null;
+    _this._clickCount = 0;
 
     _this.state = {
       dragging: false,
@@ -171,6 +189,7 @@ ResizeHandle.propTypes = {
   onResizeStart: _react2.default.PropTypes.func,
   onResize: _react2.default.PropTypes.func,
   onResizeEnd: _react2.default.PropTypes.func,
+  onResizeDoubleClick: _react2.default.PropTypes.func,
   dimension: _react2.default.PropTypes.string
 };
 ResizeHandle.defaultProps = {
