@@ -54,6 +54,7 @@ var ResizeHandle = function (_React$Component) {
 
         if (_this.props.onResizeDoubleClick) {
           _this.props.onResizeDoubleClick();
+          event.preventDefault();
           return;
         }
       }

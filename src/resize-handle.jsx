@@ -93,6 +93,7 @@ export default class ResizeHandle extends React.Component {
 
       if (this.props.onResizeDoubleClick) {
         this.props.onResizeDoubleClick();
+        event.preventDefault();
         return;
       }
     }
