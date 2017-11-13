@@ -807,29 +807,6 @@ var Grid = function (_React$Component) {
     delete this._pinnedRowHeights[rowIndex];
   };
 
-  Grid.prototype.renderRow = function renderRow(pane, cells, rowData, columnRange) {
-    var rowIndex = rowData[0],
-        rowTop = rowData[1],
-        height = rowData[2];
-
-
-    var rowStyle = {
-      position: 'absolute',
-      left: 0,
-      top: rowTop,
-      height: height
-    };
-
-    var renderCells = this.props.renderCells || this.renderCells;
-
-    return _react2.default.createElement(
-      'div',
-      { key: 'row-' + rowIndex,
-        style: rowStyle },
-      renderCells(cells)
-    );
-  };
-
   Grid.prototype.renderCells = function renderCells(cells) {
     return cells;
   };
@@ -1130,6 +1107,29 @@ var _initialiseProps = function _initialiseProps() {
     }
 
     return _this5.props.columnWidth(column);
+  };
+
+  this.renderRow = function (pane, cells, rowData, columnRange) {
+    var rowIndex = rowData[0],
+        rowTop = rowData[1],
+        height = rowData[2];
+
+
+    var rowStyle = {
+      position: 'absolute',
+      left: 0,
+      top: rowTop,
+      height: height
+    };
+
+    var renderCells = _this5.props.renderCells || _this5.renderCells;
+
+    return _react2.default.createElement(
+      'div',
+      { key: 'row-' + rowIndex,
+        style: rowStyle },
+      renderCells(cells)
+    );
   };
 };
 
