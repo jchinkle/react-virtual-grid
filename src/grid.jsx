@@ -991,7 +991,7 @@ export default class Grid extends React.Component {
     delete this._pinnedRowHeights[rowIndex];
   }
 
-  renderRow(pane, cells, rowData, columnRange) {
+  renderRow = (pane, cells, rowData, columnRange) => {
     const [ rowIndex, rowTop, height ] = rowData;
 
     const rowStyle = {
