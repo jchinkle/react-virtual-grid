@@ -1,20 +1,21 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ResizeHandle from './resize-handle';
 
 export default class ResizableCell extends React.Component {
   static propTypes = {
-    onColumnResizeStart: React.PropTypes.func,
-    onColumnResize: React.PropTypes.func,
-    onColumnResizeEnd: React.PropTypes.func,
-    onColumnResizeDoubleClick: React.PropTypes.func,
-    onRowResizeStart: React.PropTypes.func,
-    onRowResize: React.PropTypes.func,
-    onRowResizeEnd: React.PropTypes.func,
-    onRowResizeDoubleClick: React.PropTypes.func,
-    width: React.PropTypes.number.isRequired,
-    height: React.PropTypes.number.isRequired,
-    rowIndex: React.PropTypes.number.isRequired,
-    columnIndex: React.PropTypes.number.isRequired
+    onColumnResizeStart: PropTypes.func,
+    onColumnResize: PropTypes.func,
+    onColumnResizeEnd: PropTypes.func,
+    onColumnResizeDoubleClick: PropTypes.func,
+    onRowResizeStart: PropTypes.func,
+    onRowResize: PropTypes.func,
+    onRowResizeEnd: PropTypes.func,
+    onRowResizeDoubleClick: PropTypes.func,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+    rowIndex: PropTypes.number.isRequired,
+    columnIndex: PropTypes.number.isRequired
   };
 
   renderColumnResizeHandle() {

@@ -8,6 +8,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
@@ -187,11 +191,11 @@ var ResizeHandle = function (_React$Component) {
 }(_react2.default.Component);
 
 ResizeHandle.propTypes = {
-  onResizeStart: _react2.default.PropTypes.func,
-  onResize: _react2.default.PropTypes.func,
-  onResizeEnd: _react2.default.PropTypes.func,
-  onResizeDoubleClick: _react2.default.PropTypes.func,
-  dimension: _react2.default.PropTypes.string
+  onResizeStart: _propTypes2.default.func,
+  onResize: _propTypes2.default.func,
+  onResizeEnd: _propTypes2.default.func,
+  onResizeDoubleClick: _propTypes2.default.func,
+  dimension: _propTypes2.default.string
 };
 ResizeHandle.defaultProps = {
   dimension: 'width'

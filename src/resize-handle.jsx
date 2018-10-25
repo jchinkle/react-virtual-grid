@@ -1,16 +1,17 @@
 /* eslint-disable react/style-prop-object */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const DOUBLE_CLICK_DELAY = 500;
 
 export default class ResizeHandle extends React.Component {
   static propTypes = {
-    onResizeStart: React.PropTypes.func,
-    onResize: React.PropTypes.func,
-    onResizeEnd: React.PropTypes.func,
-    onResizeDoubleClick: React.PropTypes.func,
-    dimension: React.PropTypes.string
+    onResizeStart: PropTypes.func,
+    onResize: PropTypes.func,
+    onResizeEnd: PropTypes.func,
+    onResizeDoubleClick: PropTypes.func,
+    dimension: PropTypes.string
   };
 
   static defaultProps = {

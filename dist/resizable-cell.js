@@ -6,6 +6,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _resizeHandle = require('./resize-handle');
 
 var _resizeHandle2 = _interopRequireDefault(_resizeHandle);
@@ -86,18 +90,18 @@ var ResizableCell = function (_React$Component) {
 }(_react2.default.Component);
 
 ResizableCell.propTypes = {
-  onColumnResizeStart: _react2.default.PropTypes.func,
-  onColumnResize: _react2.default.PropTypes.func,
-  onColumnResizeEnd: _react2.default.PropTypes.func,
-  onColumnResizeDoubleClick: _react2.default.PropTypes.func,
-  onRowResizeStart: _react2.default.PropTypes.func,
-  onRowResize: _react2.default.PropTypes.func,
-  onRowResizeEnd: _react2.default.PropTypes.func,
-  onRowResizeDoubleClick: _react2.default.PropTypes.func,
-  width: _react2.default.PropTypes.number.isRequired,
-  height: _react2.default.PropTypes.number.isRequired,
-  rowIndex: _react2.default.PropTypes.number.isRequired,
-  columnIndex: _react2.default.PropTypes.number.isRequired
+  onColumnResizeStart: _propTypes2.default.func,
+  onColumnResize: _propTypes2.default.func,
+  onColumnResizeEnd: _propTypes2.default.func,
+  onColumnResizeDoubleClick: _propTypes2.default.func,
+  onRowResizeStart: _propTypes2.default.func,
+  onRowResize: _propTypes2.default.func,
+  onRowResizeEnd: _propTypes2.default.func,
+  onRowResizeDoubleClick: _propTypes2.default.func,
+  width: _propTypes2.default.number.isRequired,
+  height: _propTypes2.default.number.isRequired,
+  rowIndex: _propTypes2.default.number.isRequired,
+  columnIndex: _propTypes2.default.number.isRequired
 };
 exports.default = ResizableCell;
 //# sourceMappingURL=resizable-cell.js.map
