@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import cx from 'classnames';
 import GridCalculator from './grid-calculator';
 import elementResizeDetector from 'element-resize-detector';
@@ -8,47 +9,47 @@ import IScroll from 'iscroll/build/iscroll-probe';
 
 export default class Grid extends React.Component {
   static propTypes = {
-    preloadPixelsX: React.PropTypes.number,
+    preloadPixelsX: PropTypes.number,
 
-    preloadPixelsY: React.PropTypes.number,
+    preloadPixelsY: PropTypes.number,
 
-    estimatedRowHeight: React.PropTypes.number,
+    estimatedRowHeight: PropTypes.number,
 
-    estimatedColumnWidth: React.PropTypes.number,
+    estimatedColumnWidth: PropTypes.number,
 
-    columnCount: React.PropTypes.number.isRequired,
+    columnCount: PropTypes.number.isRequired,
 
-    rowCount: React.PropTypes.number.isRequired,
+    rowCount: PropTypes.number.isRequired,
 
-    fixedLeftColumnCount: React.PropTypes.number,
+    fixedLeftColumnCount: PropTypes.number,
 
-    fixedRightColumnCount: React.PropTypes.number,
+    fixedRightColumnCount: PropTypes.number,
 
-    fixedHeaderCount: React.PropTypes.number,
+    fixedHeaderCount: PropTypes.number,
 
-    fixedFooterCount: React.PropTypes.number,
+    fixedFooterCount: PropTypes.number,
 
-    columnWidth: React.PropTypes.oneOfType([ React.PropTypes.number, React.PropTypes.func ]),
+    columnWidth: PropTypes.oneOfType([ PropTypes.number, PropTypes.func ]),
 
-    rowHeight: React.PropTypes.oneOfType([ React.PropTypes.number, React.PropTypes.func ]),
+    rowHeight: PropTypes.oneOfType([ PropTypes.number, PropTypes.func ]),
 
-    renderRow: React.PropTypes.func,
+    renderRow: PropTypes.func,
 
-    renderRows: React.PropTypes.func,
+    renderRows: PropTypes.func,
 
-    renderCell: React.PropTypes.func,
+    renderCell: PropTypes.func,
 
-    renderCells: React.PropTypes.func,
+    renderCells: PropTypes.func,
 
-    onExtentsChange: React.PropTypes.func,
+    onExtentsChange: PropTypes.func,
 
-    onScrollStart: React.PropTypes.func,
+    onScrollStart: PropTypes.func,
 
-    onScroll: React.PropTypes.func,
+    onScroll: PropTypes.func,
 
-    onScrollEnd: React.PropTypes.func,
+    onScrollEnd: PropTypes.func,
 
-    scrollOptions: React.PropTypes.object
+    scrollOptions: PropTypes.object
   };
 
   static defaultProps = {
